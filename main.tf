@@ -158,9 +158,9 @@ resource "google_compute_address" "bastion_host_external_ip" {
 
 module "bastion_host_service_account" {
   source            = "airasia/service_account/google"
-  version           = "1.0.0"
+  version           = "1.1.0"
   providers         = { google = google }
-  tf_env            = var.name_suffix
+  name_suffix       = var.name_suffix
   account_id        = "bastion-host-sa"
   display_name      = "BastionHost-ServiceAccount"
   description       = "Manages permissions available to the VPC Bastion Host"

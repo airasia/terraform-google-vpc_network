@@ -1,6 +1,5 @@
 terraform {
   required_version = "0.12.24" # see https://releases.hashicorp.com/terraform/
-  experiments      = [variable_validation]
 }
 
 provider "google" {
@@ -9,45 +8,45 @@ provider "google" {
 
 locals {
   # VPC Net/Subnet names ---------------------------------------------------------------------------
-  vpc_name            = format("vpc-network-%s", var.tf_env)
-  subnet_name_public  = format("public-subnet-%s", var.tf_env)
-  subnet_name_private = format("private-subnet-%s", var.tf_env)
+  vpc_name            = format("vpc-network-%s", var.name_suffix)
+  subnet_name_public  = format("public-subnet-%s", var.name_suffix)
+  subnet_name_private = format("private-subnet-%s", var.name_suffix)
   # VPC IP ranges ----------------------------------------------------------------------------------
   ip_range_public_primary  = "10.10.0.0/16"
   ip_range_private_primary = "10.20.0.0/16"
   private_secondary_ip_ranges = {
     k8s_pods = {
       ip_cidr_range = "10.21.0.0/16"
-      range_name    = format("private-k8spods-%s", var.tf_env)
+      range_name    = format("private-k8spods-%s", var.name_suffix)
     },
     k8s_svcs = {
       ip_cidr_range = "10.22.0.0/16"
-      range_name    = format("private-k8ssvcs-%s", var.tf_env)
+      range_name    = format("private-k8ssvcs-%s", var.name_suffix)
     },
     redis = {
       ip_cidr_range = "10.23.0.0/29" # must be /29 - see https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
-      range_name    = format("private-redis-%s", var.tf_env)
+      range_name    = format("private-redis-%s", var.name_suffix)
     },
     g_services = { # google service producers for CloudSQL, Firebase, Etc
       ip_cidr_range = "10.24.0.0/16"
-      range_name    = format("private-gservices-%s", var.tf_env)
+      range_name    = format("private-gservices-%s", var.name_suffix)
     },
   }
   # Cloud NAT --------------------------------------------------------------------------------------
-  cloud_router_name = format("cloud-router-%s", var.tf_env)
-  cloud_nat_name    = format("cloud-nat-%s", var.tf_env)
+  cloud_router_name = format("cloud-router-%s", var.name_suffix)
+  cloud_nat_name    = format("cloud-nat-%s", var.name_suffix)
   # Bastion Host -----------------------------------------------------------------------------------
   bastion_host_name             = "bastion-host"
   bastion_host_zone             = format("%s-a", data.google_client_config.google_client.region)
   bastion_host_tags             = ["bastion"]
-  bastion_host_external_ip_name = format("bastion-external-ip-%s", var.tf_env)
+  bastion_host_external_ip_name = format("bastion-external-ip-%s", var.name_suffix)
   # Bastion Host firewall --------------------------------------------------------------------------
-  bastion_firewall_name        = format("outside-to-bastion-%s", var.tf_env)
-  network_firewall_name        = format("bastion-to-network-%s", var.tf_env)
+  bastion_firewall_name        = format("outside-to-bastion-%s", var.name_suffix)
+  network_firewall_name        = format("bastion-to-network-%s", var.name_suffix)
   google_iap_cidr              = "35.235.240.0/20" # GCloud Identity Aware Proxy Netblock - https://cloud.google.com/iap/docs/using-tcp-forwarding#before_you_begin
   all_bastion_host_allowed_IPs = toset(concat(var.bastion_host_allowed_IPs, [local.google_iap_cidr /* see https://stackoverflow.com/a/57024714/636762 */]))
   # Google Services Peering ------------------------------------------------------------------------
-  g_services_address_name          = format("gservices-address-%s", var.tf_env)
+  g_services_address_name          = format("gservices-address-%s", var.name_suffix)
   g_services_address_ip            = split("/", local.private_secondary_ip_ranges.g_services.ip_cidr_range)[0]
   g_services_address_prefix_length = split("/", local.private_secondary_ip_ranges.g_services.ip_cidr_range)[1]
   # ------------------------------------------------------------------------------------------------
@@ -161,7 +160,7 @@ module "bastion_host_service_account" {
   source            = "airasia/service_account/google"
   version           = "1.0.0"
   providers         = { google = google }
-  tf_env            = var.tf_env
+  tf_env            = var.name_suffix
   account_id        = "bastion-host-sa"
   display_name      = "BastionHost-ServiceAccount"
   description       = "Manages permissions available to the VPC Bastion Host"
@@ -173,7 +172,7 @@ module "bastion_host" {
   source                 = "airasia/vm_instance/google"
   version                = "1.0.0"
   providers              = { google = google }
-  tf_env                 = var.tf_env
+  tf_env                 = var.name_suffix
   name                   = local.bastion_host_name
   zone                   = local.bastion_host_zone
   tags                   = local.bastion_host_tags

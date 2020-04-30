@@ -170,9 +170,9 @@ module "bastion_host_service_account" {
 
 module "bastion_host" {
   source                 = "airasia/vm_instance/google"
-  version                = "1.0.0"
+  version                = "1.1.0"
   providers              = { google = google }
-  tf_env                 = var.name_suffix
+  name_suffix            = var.name_suffix
   name                   = local.bastion_host_name
   zone                   = local.bastion_host_zone
   tags                   = local.bastion_host_tags

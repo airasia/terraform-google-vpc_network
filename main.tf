@@ -206,14 +206,14 @@ resource "google_compute_firewall" "bastion_to_network_firewall" {
   allow { protocol = "udp" }
 }
 
-resource "google_project_iam_member" "bation_host_login_role_IAP_secured_tunnel_user" {
+resource "google_project_iam_member" "bastion_host_login_role_iap_secured_tunnel_user" {
   count      = length(var.bastion_host_user_groups)
   role       = "roles/iap.tunnelResourceAccessor"
   member     = "group:${var.bastion_host_user_groups[count.index]}"
   depends_on = [google_compute_firewall.gshell_to_bastion_firewall, google_project_service.networking_api]
 }
 
-resource "google_project_iam_member" "bation_host_login_role_service_account_user" {
+resource "google_project_iam_member" "bastion_host_login_role_service_account_user" {
   count      = length(var.bastion_host_user_groups)
   role       = "roles/iam.serviceAccountUser"
   member     = "group:${var.bastion_host_user_groups[count.index]}"
@@ -221,7 +221,7 @@ resource "google_project_iam_member" "bation_host_login_role_service_account_use
   # see https://cloud.google.com/compute/docs/instances/managing-instance-access#configure_users
 }
 
-resource "google_project_iam_member" "bation_host_login_role_compute_OS_login" {
+resource "google_project_iam_member" "bastion_host_login_role_compute_OS_login" {
   count      = length(var.bastion_host_user_groups)
   role       = "roles/compute.osLogin"
   member     = "group:${var.bastion_host_user_groups[count.index]}"

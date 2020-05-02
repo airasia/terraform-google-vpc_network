@@ -161,7 +161,7 @@ module "bastion_host_service_account" {
   version           = "1.1.0"
   providers         = { google = google }
   name_suffix       = var.name_suffix
-  account_id        = "bastion-host-sa"
+  account_id        = "bastion"
   display_name      = "BastionHost-ServiceAccount"
   description       = "Manages permissions available to the VPC Bastion Host"
   roles             = var.bastion_host_sa_roles

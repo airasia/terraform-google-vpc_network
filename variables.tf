@@ -7,11 +7,6 @@ variable "name_suffix" {
   type        = string
 }
 
-variable "bastion_host_disk_image" {
-  description = "The boot disk image to be used by the Bastion Host."
-  type        = string
-}
-
 # ----------------------------------------------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
 # ----------------------------------------------------------------------------------------------------------------------
@@ -62,28 +57,4 @@ variable "nat_timeout" {
   description = "how long a Cloud NAT operation is allowed to take before being considered a failure."
   type        = string
   default     = "10m"
-}
-
-variable "ip_address_timeout" {
-  description = "how long a Compute Address operation is allowed to take before being considered a failure."
-  type        = string
-  default     = "5m"
-}
-
-variable "bastion_host_allowed_IPs" {
-  description = "CIDR blocks of IP ranges that maybe allowed access to SSH into bastion host."
-  type        = list(string)
-  default     = []
-}
-
-variable "bastion_host_user_groups" {
-  description = "List of usergroup emails that maybe allowed access to login to the bastion host. For example: SSH login via CLoudSHell."
-  type        = list(string)
-  default     = []
-}
-
-variable "bastion_host_sa_roles" {
-  description = "The IAM roles that should be granted to the ServiceAccount which is attached to the bastion host. This will enable the bastion host to access other GCP resources as permitted (or disallowed) by the IAM roles."
-  type        = list(string)
-  default     = []
 }

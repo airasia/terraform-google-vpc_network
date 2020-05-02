@@ -38,11 +38,6 @@ output "ip_range_private_redis_store" {
   value       = local.private_secondary_ip_ranges.redis.ip_cidr_range
 }
 
-output "bastion_host_ip" {
-  description = "The External IP assigned to the bastion host."
-  value       = module.bastion_host.ip_address
-}
-
 output "peered_google_services" {
   description = "The google services producers that are peered with the VPC."
   value = [

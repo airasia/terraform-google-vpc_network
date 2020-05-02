@@ -35,16 +35,6 @@ locals {
   # Cloud NAT --------------------------------------------------------------------------------------
   cloud_router_name = format("cloud-router-%s", var.name_suffix)
   cloud_nat_name    = format("cloud-nat-%s", var.name_suffix)
-  # Bastion Host -----------------------------------------------------------------------------------
-  bastion_host_name             = "bastion-host"
-  bastion_host_zone             = format("%s-a", data.google_client_config.google_client.region)
-  bastion_host_tags             = ["bastion"]
-  bastion_host_external_ip_name = format("bastion-external-ip-%s", var.name_suffix)
-  # Bastion Host firewall --------------------------------------------------------------------------
-  bastion_firewall_name        = format("outside-to-bastion-%s", var.name_suffix)
-  network_firewall_name        = format("bastion-to-network-%s", var.name_suffix)
-  google_iap_cidr              = "35.235.240.0/20" # GCloud Identity Aware Proxy Netblock - https://cloud.google.com/iap/docs/using-tcp-forwarding#before_you_begin
-  all_bastion_host_allowed_IPs = toset(concat(var.bastion_host_allowed_IPs, [local.google_iap_cidr /* see https://stackoverflow.com/a/57024714/636762 */]))
   # Google Services Peering ------------------------------------------------------------------------
   g_services_address_name          = format("gservices-address-%s", var.name_suffix)
   g_services_address_ip            = split("/", local.private_secondary_ip_ranges.g_services.ip_cidr_range)[0]
@@ -144,88 +134,6 @@ resource "google_compute_router_nat" "cloud_nat" {
     update = var.nat_timeout
     delete = var.nat_timeout
   }
-}
-
-resource "google_compute_address" "bastion_host_external_ip" {
-  name       = local.bastion_host_external_ip_name
-  region     = data.google_client_config.google_client.region
-  depends_on = [google_compute_network.vpc, google_project_service.networking_api]
-  timeouts {
-    create = var.ip_address_timeout
-    delete = var.ip_address_timeout
-  }
-}
-
-module "bastion_host_service_account" {
-  source            = "airasia/service_account/google"
-  version           = "1.1.0"
-  providers         = { google = google }
-  name_suffix       = var.name_suffix
-  account_id        = "bastion-host-sa"
-  display_name      = "BastionHost-ServiceAccount"
-  description       = "Manages permissions available to the VPC Bastion Host"
-  roles             = var.bastion_host_sa_roles
-  module_depends_on = [google_compute_subnetwork.public_subnet.id, google_project_service.networking_api.id]
-}
-
-module "bastion_host" {
-  source                 = "airasia/vm_instance/google"
-  version                = "1.1.0"
-  providers              = { google = google }
-  name_suffix            = var.name_suffix
-  name                   = local.bastion_host_name
-  zone                   = local.bastion_host_zone
-  tags                   = local.bastion_host_tags
-  boot_disk_image_source = var.bastion_host_disk_image
-  vpc_subnetwork         = google_compute_subnetwork.public_subnet.self_link
-  static_ip              = google_compute_address.bastion_host_external_ip.address
-  service_account_email  = module.bastion_host_service_account.email
-  module_depends_on      = [google_compute_subnetwork.public_subnet.id, google_project_service.networking_api.id]
-}
-
-resource "google_compute_firewall" "gshell_to_bastion_firewall" {
-  name          = local.bastion_firewall_name
-  network       = google_compute_network.vpc.self_link
-  source_ranges = local.all_bastion_host_allowed_IPs
-  target_tags   = local.bastion_host_tags # DO NOT fetch tags from the vm_instance output as it may contain other common tags
-  depends_on    = [module.bastion_host.ip_address, google_project_service.networking_api]
-  allow {
-    protocol = "tcp"
-    ports    = ["22"]
-  }
-}
-
-resource "google_compute_firewall" "bastion_to_network_firewall" {
-  name        = local.network_firewall_name
-  network     = google_compute_network.vpc.self_link
-  source_tags = local.bastion_host_tags # DO NOT fetch tags from the vm_instance output as it may contain other common tags
-  depends_on  = [module.bastion_host.ip_address, google_project_service.networking_api]
-  allow { protocol = "icmp" }
-  allow { protocol = "tcp" }
-  allow { protocol = "udp" }
-}
-
-resource "google_project_iam_member" "bastion_host_login_role_iap_secured_tunnel_user" {
-  count      = length(var.bastion_host_user_groups)
-  role       = "roles/iap.tunnelResourceAccessor"
-  member     = "group:${var.bastion_host_user_groups[count.index]}"
-  depends_on = [google_compute_firewall.gshell_to_bastion_firewall, google_project_service.networking_api]
-}
-
-resource "google_project_iam_member" "bastion_host_login_role_service_account_user" {
-  count      = length(var.bastion_host_user_groups)
-  role       = "roles/iam.serviceAccountUser"
-  member     = "group:${var.bastion_host_user_groups[count.index]}"
-  depends_on = [google_compute_firewall.gshell_to_bastion_firewall, google_project_service.networking_api]
-  # see https://cloud.google.com/compute/docs/instances/managing-instance-access#configure_users
-}
-
-resource "google_project_iam_member" "bastion_host_login_role_compute_OS_login" {
-  count      = length(var.bastion_host_user_groups)
-  role       = "roles/compute.osLogin"
-  member     = "group:${var.bastion_host_user_groups[count.index]}"
-  depends_on = [google_compute_firewall.gshell_to_bastion_firewall, google_project_service.networking_api]
-  # see https://cloud.google.com/compute/docs/instances/managing-instance-access#configure_users
 }
 
 resource "google_compute_global_address" "g_services_address" {

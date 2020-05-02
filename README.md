@@ -1,1 +1,1 @@
-Terraform module for a VPC Network (with a Bastion Host) in GCP
+Terraform module for a VPC Network in GCP

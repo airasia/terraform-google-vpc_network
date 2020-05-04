@@ -30,7 +30,7 @@ output "ip_range_name_private_k8s_pods" {
 
 output "ip_range_name_private_k8s_services" {
   description = "Name of the private secondary IP range for k8s/GKE services."
-  value       = local.private_secondary_ip_ranges.k8s_svcs.range_name
+  value       = local.private_secondary_ip_ranges.k8s_services.range_name
 }
 
 output "ip_range_private_redis_store" {

@@ -20,7 +20,7 @@ locals {
       ip_cidr_range = "10.21.0.0/16"
       range_name    = format("private-k8spods-%s", var.name_suffix)
     },
-    k8s_svcs = {
+    k8s_services = {
       ip_cidr_range = "10.22.0.0/16"
       range_name    = format("private-k8ssvcs-%s", var.name_suffix)
     },

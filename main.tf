@@ -13,23 +13,23 @@ locals {
   subnet_name_public  = format("public-subnet-%s", var.name_suffix)
   subnet_name_private = format("private-subnet-%s", var.name_suffix)
   # VPC IP ranges ----------------------------------------------------------------------------------
-  ip_range_public_primary  = "10.10.0.0/16"
-  ip_range_private_primary = "10.20.0.0/16"
+  ip_range_public_primary  = "${var.ip_ranges.public_primary_16}/16"
+  ip_range_private_primary = "${var.ip_ranges.private_primary_16}/16"
   private_secondary_ip_ranges = {
     k8s_pods = {
-      ip_cidr_range = "10.21.0.0/16"
+      ip_cidr_range = "${var.ip_ranges.private_k8s_pods_16}/16"
       range_name    = format("private-k8spods-%s", var.name_suffix)
     },
     k8s_services = {
-      ip_cidr_range = "10.22.0.0/16"
+      ip_cidr_range = "${var.ip_ranges.private_k8s_services_16}/16"
       range_name    = format("private-k8ssvcs-%s", var.name_suffix)
     },
     redis = {
-      ip_cidr_range = "10.23.0.0/29" # must be /29 - see https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
+      ip_cidr_range = "${var.ip_ranges.private_redis_29}/29" # must be /29 - see https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
       range_name    = format("private-redis-%s", var.name_suffix)
     },
     g_services = { # google service producers for CloudSQL, Firebase, Etc
-      ip_cidr_range = "10.24.0.0/16"
+      ip_cidr_range = "${var.ip_ranges.private_g_services_16}/16"
       range_name    = format("private-gservices-%s", var.name_suffix)
     },
   }

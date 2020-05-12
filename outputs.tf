@@ -38,6 +38,11 @@ output "ip_range_private_redis_store" {
   value       = local.private_secondary_ip_ranges.redis.ip_cidr_range
 }
 
+output "ip_range_private_g_services" {
+  description = "Private secondary IP range for Google service producers. Eg: CloudSQL, Firebase, Etc."
+  value       = local.private_secondary_ip_ranges.g_services.ip_cidr_range
+}
+
 output "peered_google_services" {
   description = "The google services producers that are peered with the VPC."
   value = [

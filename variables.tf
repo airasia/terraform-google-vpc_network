@@ -51,6 +51,12 @@ variable "vpc_routing_mode" {
   default     = "REGIONAL"
 }
 
+variable "num_of_nat_manual_ips" {
+  description = "The number of static external IPs that should be reserved by Cloud NAT. Useful when private instances need to communicate with the internet using specific external IPs that maybe whitelisted by 3rd party services."
+  type        = number
+  default     = 0
+}
+
 variable "vpc_timeout" {
   description = "how long a VPC operation is allowed to take before being considered a failure."
   type        = string

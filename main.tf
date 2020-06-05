@@ -110,7 +110,7 @@ resource "google_compute_subnetwork" "private_subnet" {
 resource "google_compute_router" "cloud_router" {
   name       = local.cloud_router_name
   network    = google_compute_network.vpc.self_link
-  region     = data.google_client_config.google_client.region
+  region     = google_compute_subnetwork.private_subnet.region
   depends_on = [google_compute_subnetwork.private_subnet, google_project_service.networking_api]
   timeouts {
     create = var.router_timeout
@@ -122,7 +122,7 @@ resource "google_compute_router" "cloud_router" {
 resource "google_compute_router_nat" "cloud_nat" {
   name                               = local.cloud_nat_name
   router                             = google_compute_router.cloud_router.name
-  region                             = data.google_client_config.google_client.region
+  region                             = google_compute_subnetwork.private_subnet.region
   source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
   depends_on                         = [google_project_service.networking_api]
   subnetwork {

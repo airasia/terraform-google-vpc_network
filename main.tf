@@ -96,9 +96,10 @@ resource "google_compute_subnetwork" "private_subnet" {
         (value.ip_cidr_range != local.private_secondary_ip_ranges.g_services.ip_cidr_range)
       ) # for these IPs to be useable by their resources, they must not already be reserved by the VPC
     }
+    iterator = ip_range
     content {
-      ip_cidr_range = secondary_ip_range.value.ip_cidr_range
-      range_name    = secondary_ip_range.value.range_name
+      ip_cidr_range = ip_range.value.ip_cidr_range
+      range_name    = ip_range.value.range_name
     }
   }
   timeouts {

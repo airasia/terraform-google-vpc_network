@@ -34,8 +34,8 @@ locals {
     },
   }
   # Cloud NAT --------------------------------------------------------------------------------------
-  cloud_router_name = format("cloud-router-%s", var.name_suffix)
-  cloud_nat_name    = format("cloud-nat-%s", var.name_suffix)
+  cloud_router_name        = format("cloud-router-%s", var.name_suffix)
+  cloud_nat_name           = format("cloud-nat-%s", var.name_suffix)
   nat_ip_allocation_policy = length(google_compute_address.manual_nat_ips) > 0 ? "MANUAL_ONLY" : "AUTO_ONLY"
   # Google Services Peering ------------------------------------------------------------------------
   g_services_address_name          = format("gservices-address-%s", var.name_suffix)

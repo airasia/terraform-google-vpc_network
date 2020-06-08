@@ -45,6 +45,12 @@ variable "name_private_subnet" {
   default = "private-subnet"
 }
 
+variable "name_cloud_router" {
+  description = "Portion of name to be constructed for Cloud Router."
+  type = string
+  default = "cloud-router"
+}
+
 variable "name_cloud_nat" {
   description = "Portion of name to be constructed for Cloud NAT."
   type = string

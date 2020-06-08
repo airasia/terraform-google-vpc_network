@@ -11,7 +11,7 @@ locals {
   # VPC Net/Subnet names ---------------------------------------------------------------------------
   vpc_name            = format("vpc-network-%s", var.name_suffix)
   subnet_name_public  = format("public-subnet-%s", var.name_suffix)
-  subnet_name_private = format("private-subnet-%s", var.name_suffix)
+  subnet_name_private = format("%s-%s", var.name_private_subnet, var.name_suffix)
   # VPC IP ranges ----------------------------------------------------------------------------------
   ip_range_public_primary  = "${var.ip_ranges.public_primary}"
   ip_range_private_primary = "${var.ip_ranges.private_primary}"

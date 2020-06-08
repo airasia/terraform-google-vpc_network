@@ -27,6 +27,48 @@ variable "ip_ranges" {
 # OPTIONAL PARAMETERS
 # ----------------------------------------------------------------------------------------------------------------------
 
+variable "name_vpc_network" {
+  description = "Portion of name to be constructed for VPC network."
+  type = string
+  default = "vpc-network"
+}
+
+variable "name_public_subnet" {
+  description = "Portion of name to be constructed for public subnet."
+  type = string
+  default = "public-subnet"
+}
+
+variable "name_private_subnet" {
+  description = "Portion of name to be constructed for private subnet."
+  type = string
+  default = "private-subnet"
+}
+
+variable "name_cloud_router" {
+  description = "Portion of name to be constructed for Cloud Router."
+  type = string
+  default = "cloud-router"
+}
+
+variable "name_cloud_nat" {
+  description = "Portion of name to be constructed for Cloud NAT."
+  type = string
+  default = "cloud-nat"
+}
+
+variable "name_g_services_address" {
+  description = "Portion of name to be constructed for static GServices IP address."
+  type = string
+  default = "gservices-address"
+}
+
+variable "name_static_nat_ips" {
+  description = "Portion of name to be constructed for static NAT IP addresses if value of \"var.num_of_static_nat_ips\" is greater than \"0\"."
+  type = string
+  default = "nat-manual-ip"
+}
+
 variable "vpc_description" {
   description = "The description of the VPC Network."
   type        = string

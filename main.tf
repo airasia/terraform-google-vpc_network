@@ -9,9 +9,9 @@ provider "google" {
 
 locals {
   # VPC Net/Subnet names ---------------------------------------------------------------------------
-  vpc_name            = format("vpc-network-%s", var.name_suffix)
-  subnet_name_public  = format("public-subnet-%s", var.name_suffix)
-  subnet_name_private = format("private-subnet-%s", var.name_suffix)
+  vpc_name            = format("%s-%s", var.name_vpc_network, var.name_suffix)
+  subnet_name_public  = format("%s-%s", var.name_public_subnet, var.name_suffix)
+  subnet_name_private = format("%s-%s", var.name_private_subnet, var.name_suffix)
   # VPC IP ranges ----------------------------------------------------------------------------------
   ip_range_public_primary  = "${var.ip_ranges.public_primary}"
   ip_range_private_primary = "${var.ip_ranges.private_primary}"
@@ -34,11 +34,11 @@ locals {
     },
   }
   # Cloud NAT --------------------------------------------------------------------------------------
-  cloud_router_name        = format("cloud-router-%s", var.name_suffix)
-  cloud_nat_name           = format("cloud-nat-%s", var.name_suffix)
+  cloud_router_name        = format("%s-%s", var.name_cloud_router, var.name_suffix)
+  cloud_nat_name           = format("%s-%s", var.name_cloud_nat, var.name_suffix)
   nat_ip_allocation_policy = var.num_of_static_nat_ips > 0 ? "MANUAL_ONLY" : "AUTO_ONLY"
   # Google Services Peering ------------------------------------------------------------------------
-  g_services_address_name          = format("gservices-address-%s", var.name_suffix)
+  g_services_address_name          = format("%s-%s", var.name_g_services_address, var.name_suffix)
   g_services_address_ip            = split("/", local.private_secondary_ip_ranges.g_services.ip_cidr_range)[0]
   g_services_address_prefix_length = split("/", local.private_secondary_ip_ranges.g_services.ip_cidr_range)[1]
   # ------------------------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ resource "google_compute_router" "cloud_router" {
 
 resource "google_compute_address" "manual_nat_ips" {
   count  = var.num_of_static_nat_ips
-  name   = "nat-manual-ip-${count.index + 1}-${var.name_suffix}"
+  name   = "${var.name_static_nat_ips}-${count.index + 1}-${var.name_suffix}"
   region = google_compute_subnetwork.private_subnet.region
   lifecycle { prevent_destroy = true }
 }

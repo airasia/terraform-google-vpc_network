@@ -57,6 +57,12 @@ variable "name_cloud_nat" {
   default = "cloud-nat"
 }
 
+variable "name_g_services_address" {
+  description = "Portion of name to be constructed for static GServices IP address."
+  type = string
+  default = "gservices-address"
+}
+
 variable "vpc_description" {
   description = "The description of the VPC Network."
   type        = string

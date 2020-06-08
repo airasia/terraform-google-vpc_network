@@ -45,6 +45,12 @@ variable "name_private_subnet" {
   default = "private-subnet"
 }
 
+variable "name_cloud_nat" {
+  description = "Portion of name to be constructed for Cloud NAT."
+  type = string
+  default = "cloud-nat"
+}
+
 variable "vpc_description" {
   description = "The description of the VPC Network."
   type        = string

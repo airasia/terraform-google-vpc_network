@@ -27,6 +27,12 @@ variable "ip_ranges" {
 # OPTIONAL PARAMETERS
 # ----------------------------------------------------------------------------------------------------------------------
 
+variable "name_vpc_network" {
+  description = "Portion of name to be constructed for VPC network."
+  type = string
+  default = "vpc-network"
+}
+
 variable "name_public_subnet" {
   description = "Portion of name to be constructed for public subnet."
   type = string

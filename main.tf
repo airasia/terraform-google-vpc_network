@@ -9,7 +9,7 @@ provider "google" {
 
 locals {
   # VPC Net/Subnet names ---------------------------------------------------------------------------
-  vpc_name            = format("vpc-network-%s", var.name_suffix)
+  vpc_name            = format("%s-%s", var.name_vpc_network, var.name_suffix)
   subnet_name_public  = format("%s-%s", var.name_public_subnet, var.name_suffix)
   subnet_name_private = format("%s-%s", var.name_private_subnet, var.name_suffix)
   # VPC IP ranges ----------------------------------------------------------------------------------

@@ -121,7 +121,7 @@ resource "google_compute_router" "cloud_router" {
   }
 }
 
-resource "google_compute_address" "manual_nat_ips" {
+resource "google_compute_address" "static_nat_ips" {
   count  = var.num_of_static_nat_ips
   name   = "${var.name_static_nat_ips}-${count.index + 1}-${var.name_suffix}"
   region = google_compute_subnetwork.private_subnet.region
@@ -139,7 +139,7 @@ resource "google_compute_router_nat" "cloud_nat" {
     source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
   }
   nat_ip_allocate_option = local.nat_ip_allocation_policy
-  nat_ips                = google_compute_address.manual_nat_ips.*.self_link
+  nat_ips                = google_compute_address.static_nat_ips.*.self_link
   dynamic "log_config" {
     # If the NAT gateway runs out of NAT IP addresses, Cloud NAT drops packets.
     # Dropped packets are logged when error logging is turned on using Cloud NAT logging.

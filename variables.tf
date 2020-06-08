@@ -64,7 +64,7 @@ variable "name_g_services_address" {
 }
 
 variable "name_static_nat_ips" {
-  description = "Portion of name to be constructed for static NAT IP addresses if value of \"var.num_of_static_nat_ips\" is greater than \"0\"."
+  description = "Portion of name to be constructed for static/manual NAT IP addresses if value of \"var.num_of_static_nat_ips\" is greater than \"0\"."
   type = string
   default = "nat-manual-ip"
 }
@@ -94,7 +94,7 @@ variable "vpc_routing_mode" {
 }
 
 variable "num_of_static_nat_ips" {
-  description = "The number of static external IPs that should be reserved by Cloud NAT. Useful when private instances need to communicate with the internet using specific external IPs that maybe whitelisted by 3rd party services."
+  description = "The number of static/manual external IPs that should be reserved by Cloud NAT. Useful when private instances need to communicate with the internet using specific external IPs that maybe whitelisted by 3rd party services."
   type        = number
   default     = 0
 }

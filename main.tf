@@ -125,7 +125,6 @@ resource "google_compute_address" "static_nat_ips" {
   count  = var.num_of_static_nat_ips
   name   = "${var.name_static_nat_ips}-${count.index + 1}-${var.name_suffix}"
   region = google_compute_subnetwork.private_subnet.region
-  lifecycle { prevent_destroy = true }
 }
 
 resource "google_compute_router_nat" "cloud_nat" {

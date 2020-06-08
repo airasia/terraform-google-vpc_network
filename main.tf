@@ -123,7 +123,7 @@ resource "google_compute_router" "cloud_router" {
 
 resource "google_compute_address" "manual_nat_ips" {
   count  = var.num_of_static_nat_ips
-  name   = "nat-manual-ip-${count.index + 1}-${var.name_suffix}"
+  name   = "${var.name_static_nat_ips}-${count.index + 1}-${var.name_suffix}"
   region = google_compute_subnetwork.private_subnet.region
   lifecycle { prevent_destroy = true }
 }

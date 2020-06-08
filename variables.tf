@@ -12,14 +12,14 @@ variable "name_suffix" {
 }
 
 variable "ip_ranges" {
-  description = "A map of IP CIDR ranges (excluding their /xx suffix parts) that should be used by the public/private subnets for the various conpoments of the infrastructure. See comments in source code for elaboration on accepted keys."
+  description = "A map of IP CIDR ranges (including their /x parts) that should be used by the public/private subnets for the various conpoments of the infrastructure. See comments in source code for elaboration on accepted keys."
   type = object({
-    public_primary_16       = string # a /16 CIDR range (excluding the '/16' part) for primary IPs in public subnet of the VPC.
-    private_primary_16      = string # a /16 CIDR range (excluding the '/16' part) for primary IPs in private subnet of the VPC.
-    private_k8s_pods_16     = string # a /16 CIDR range (excluding the '/16' part) for k8s pods in private subnet of the VPC.
-    private_k8s_services_16 = string # a /16 CIDR range (excluding the '/16' part) for k8s services in private subnet of the VPC.
-    private_redis_29        = string # a /29 CIDR range (excluding the '/29' part) for redis memorystore in private subnet of the VPC.
-    private_g_services_16   = string # a /16 CIDR range (excluding the '/16' part) for Google services producers (like CloudSQL, Firebase, etc) in private subnet of the VPC.
+    public_primary       = string # a CIDR range including /x part (/16 advised) for primary IPs in public subnet of the VPC.
+    private_primary      = string # a CIDR range including /x part (/16 advised) for primary IPs in private subnet of the VPC.
+    private_k8s_pods     = string # a CIDR range including /x part (/16 advised) for k8s pods in private subnet of the VPC.
+    private_k8s_services = string # a CIDR range including /x part (/16 advised) for k8s services in private subnet of the VPC.
+    private_redis        = string # a CIDR range including /x part (/29 required) for redis memorystore in private subnet of the VPC. See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
+    private_g_services   = string # a CIDR range including /x part (/16 advised) for Google services producers (like CloudSQL, Firebase, etc) in private subnet of the VPC.
   })
 }
 

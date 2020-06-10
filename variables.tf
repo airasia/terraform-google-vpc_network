@@ -29,44 +29,44 @@ variable "ip_ranges" {
 
 variable "name_vpc_network" {
   description = "Portion of name to be generated for the VPC network."
-  type = string
-  default = "vpc-network"
+  type        = string
+  default     = "vpc-network"
 }
 
 variable "name_public_subnet" {
   description = "Portion of name to be generated for the public subnet."
-  type = string
-  default = "public-subnet"
+  type        = string
+  default     = "public-subnet"
 }
 
 variable "name_private_subnet" {
   description = "Portion of name to be generated for the private subnet."
-  type = string
-  default = "private-subnet"
+  type        = string
+  default     = "private-subnet"
 }
 
 variable "name_cloud_router" {
   description = "Portion of name to be generated for the Cloud Router."
-  type = string
-  default = "cloud-router"
+  type        = string
+  default     = "cloud-router"
 }
 
 variable "name_cloud_nat" {
   description = "Portion of name to be generated for the Cloud NAT."
-  type = string
-  default = "cloud-nat"
+  type        = string
+  default     = "cloud-nat"
 }
 
 variable "name_g_services_address" {
   description = "Portion of name to be generated for the static GServices IP address."
-  type = string
-  default = "gservices-address"
+  type        = string
+  default     = "gservices-address"
 }
 
 variable "name_static_nat_ips" {
   description = "Portion of name to be generated for the static/manual NAT IP addresses if value of \"var.num_of_static_nat_ips\" is greater than \"0\"."
-  type = string
-  default = "nat-manual-ip"
+  type        = string
+  default     = "nat-manual-ip"
 }
 
 variable "vpc_description" {

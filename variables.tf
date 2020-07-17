@@ -96,7 +96,7 @@ variable "vpc_routing_mode" {
 variable "num_of_static_nat_ips" {
   description = "The number of static/manual external IPs that should be reserved by Cloud NAT. Useful when private instances need to communicate with the internet using specific external IPs that maybe whitelisted by 3rd party services."
   type        = number
-  default     = 0
+  default     = 1
 }
 
 variable "vpc_timeout" {

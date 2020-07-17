@@ -36,7 +36,7 @@ locals {
   # Cloud NAT --------------------------------------------------------------------------------------
   cloud_router_name        = format("%s-%s", var.name_cloud_router, var.name_suffix)
   cloud_nat_name           = format("%s-%s", var.name_cloud_nat, var.name_suffix)
-  nat_ip_allocation_policy = var.num_of_static_nat_ips > 0 ? "MANUAL_ONLY" : "AUTO_ONLY"
+  nat_ip_allocate_option = var.num_of_static_nat_ips > 0 ? "MANUAL_ONLY" : "AUTO_ONLY"
   # Google Services Peering ------------------------------------------------------------------------
   g_services_address_name          = format("%s-%s", var.name_g_services_address, var.name_suffix)
   g_services_address_ip            = split("/", local.private_secondary_ip_ranges.g_services.ip_cidr_range)[0]
@@ -137,13 +137,13 @@ resource "google_compute_router_nat" "cloud_nat" {
     name                    = google_compute_subnetwork.private_subnet.self_link
     source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
   }
-  nat_ip_allocate_option = local.nat_ip_allocation_policy
+  nat_ip_allocate_option = local.nat_ip_allocate_option
   nat_ips                = google_compute_address.static_nat_ips.*.self_link
   dynamic "log_config" {
     # If the NAT gateway runs out of NAT IP addresses, Cloud NAT drops packets.
     # Dropped packets are logged when error logging is turned on using Cloud NAT logging.
     # See https://cloud.google.com/nat/docs/ports-and-addresses#addresses
-    for_each = local.nat_ip_allocation_policy == "MANUAL_ONLY" ? [1] : []
+    for_each = local.nat_ip_allocate_option == "MANUAL_ONLY" ? [1] : []
     content {
       enable = true
       filter = "ERRORS_ONLY"

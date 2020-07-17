@@ -140,15 +140,12 @@ resource "google_compute_router_nat" "cloud_nat" {
   }
   nat_ip_allocate_option = local.nat_ip_allocate_option
   nat_ips                = local.nat_ips
-  dynamic "log_config" {
+  log_config {
     # If the NAT gateway runs out of NAT IP addresses, Cloud NAT drops packets.
     # Dropped packets are logged when error logging is turned on using Cloud NAT logging.
     # See https://cloud.google.com/nat/docs/ports-and-addresses#addresses
-    for_each = local.nat_ip_allocate_option == "MANUAL_ONLY" ? [1] : []
-    content {
-      enable = true
-      filter = "ERRORS_ONLY"
-    }
+    enable = true
+    filter = "ERRORS_ONLY"
   }
   timeouts {
     create = var.nat_timeout

@@ -14,11 +14,11 @@ variable "name_suffix" {
 variable "ip_ranges" {
   description = "A map of IP CIDR ranges (including their /x parts) that should be used by the public/private subnets for the various components of the infrastructure. See comments in source code for elaboration on accepted keys."
   type = object({
-    public_primary       = string # a CIDR range including /x part (/16 advised) for primary IPs in public subnet of the VPC.
-    private_primary      = string # a CIDR range including /x part (/16 advised) for primary IPs in private subnet of the VPC.
-    private_k8s          = list(object({ pods = string, svcs = string })) # list of objects of CIDR ranges - each with their /x parts (/16 advised) - for pods & services in a k8s cluster.
-    private_redis        = list(string) # list of CIDR ranges - each with their /x parts (/29 required) - for Redis. See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
-    private_g_services   = string # a CIDR range including /x part (/16 advised) for Google services producers (like CloudSQL, Firebase, etc) in private subnet of the VPC.
+    public_primary     = string                                         # a CIDR range including /x part (/16 advised) for primary IPs in public subnet of the VPC.
+    private_primary    = string                                         # a CIDR range including /x part (/16 advised) for primary IPs in private subnet of the VPC.
+    private_k8s        = list(object({ pods = string, svcs = string })) # list of objects of CIDR ranges - each with their /x parts (/16 advised) - for pods & services in a k8s cluster.
+    private_redis      = list(string)                                   # list of CIDR ranges - each with their /x parts (/29 required) - for Redis. See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
+    private_g_services = string                                         # a CIDR range including /x part (/16 advised) for Google services producers (like CloudSQL, Firebase, etc) in private subnet of the VPC.
   })
 }
 

@@ -31,7 +31,7 @@ output "cloud_nat_ips" {
 output "ip_range_names_private_k8s_pods" {
   description = "Name of the private subnet IP range for k8s/GKE pods."
   value = [
-    for range_name in local.ip_ranges.private.k8s.*.name :
+    for range_name in google_compute_subnetwork.private_subnet.secondary_ip_range.*.range_name :
     range_name if length(regexall("k8spods", range_name)) > 0 # contains "k8spods" in the name
   ]
 }
@@ -39,7 +39,7 @@ output "ip_range_names_private_k8s_pods" {
 output "ip_range_names_private_k8s_services" {
   description = "Name of the private subnet IP range for k8s/GKE services."
   value = [
-    for range_name in local.ip_ranges.private.k8s.*.name :
+    for range_name in google_compute_subnetwork.private_subnet.secondary_ip_range.*.range_name :
     range_name if length(regexall("k8ssvcs", range_name)) > 0 # contains "k8ssvcs" in the name
   ]
 }

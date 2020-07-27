@@ -21,7 +21,7 @@ locals {
         pods = { range = var.ip_ranges.private_k8s_pods, name = format("private-k8spods-%s", var.name_suffix) }
         svcs = { range = var.ip_ranges.private_k8s_services, name = format("private-k8ssvcs-%s", var.name_suffix) }
       }
-      redis      = var.ip_ranges.private_redis      # must be /29 - See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
+      redis      = var.ip_ranges.private_redis      # each CIDR range must be /29 - See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
       g_services = var.ip_ranges.private_g_services # google service producers for CloudSQL, Firebase, Etc
     }
   }

@@ -18,7 +18,7 @@ variable "ip_ranges" {
     private_primary      = string # a CIDR range including /x part (/16 advised) for primary IPs in private subnet of the VPC.
     private_k8s_pods     = string # a CIDR range including /x part (/16 advised) for k8s pods in private subnet of the VPC.
     private_k8s_services = string # a CIDR range including /x part (/16 advised) for k8s services in private subnet of the VPC.
-    private_redis        = string # a CIDR range including /x part (/29 required) for redis memorystore in private subnet of the VPC. See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
+    private_redis        = list(string) # list of CIDR ranges - each with their /x parts (/29 required) - for Redis. See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
     private_g_services   = string # a CIDR range including /x part (/16 advised) for Google services producers (like CloudSQL, Firebase, etc) in private subnet of the VPC.
   })
 }

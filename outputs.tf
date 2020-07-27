@@ -38,8 +38,8 @@ output "ip_range_name_private_k8s_services" {
   value       = local.ip_ranges.private.k8s.svcs.name
 }
 
-output "ip_range_private_redis_store" {
-  description = "Private subnet IP range for redis MemoryStore."
+output "ip_ranges_private_redis_store" {
+  description = "List of private subnet IP ranges for redis MemoryStore."
   value       = local.ip_ranges.private.redis
 }
 

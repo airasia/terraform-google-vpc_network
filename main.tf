@@ -87,21 +87,13 @@ resource "google_compute_subnetwork" "private_subnet" {
   depends_on               = [google_project_service.networking_api]
   private_ip_google_access = true
   ip_cidr_range            = local.ip_range_private_primary
-  dynamic "secondary_ip_range" {
-    for_each = {
-      for key, value in local.private_secondary_ip_ranges :
-      key => value
-      if(
-        (value.ip_cidr_range != local.private_secondary_ip_ranges.redis.ip_cidr_range)
-        &&
-        (value.ip_cidr_range != local.private_secondary_ip_ranges.g_services.ip_cidr_range)
-      ) # for these IPs to be useable by their resources, they must not already be reserved by the VPC
-    }
-    iterator = ip_range
-    content {
-      ip_cidr_range = ip_range.value.ip_cidr_range
-      range_name    = ip_range.value.range_name
-    }
+  secondary_ip_range { # for k8s_pods
+    ip_cidr_range = local.private_secondary_ip_ranges.k8s_pods.ip_cidr_range
+    range_name    = local.private_secondary_ip_ranges.k8s_pods.range_name
+  }
+  secondary_ip_range { # for k8s_services
+    ip_cidr_range = local.private_secondary_ip_ranges.k8s_services.ip_cidr_range
+    range_name    = local.private_secondary_ip_ranges.k8s_services.range_name
   }
   timeouts {
     create = var.subnet_timeout

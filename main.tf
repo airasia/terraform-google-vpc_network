@@ -13,25 +13,17 @@ locals {
   subnet_name_public  = format("%s-%s", var.name_public_subnet, var.name_suffix)
   subnet_name_private = format("%s-%s", var.name_private_subnet, var.name_suffix)
   # VPC IP ranges ----------------------------------------------------------------------------------
-  ip_range_public_primary  = "${var.ip_ranges.public_primary}"
-  ip_range_private_primary = "${var.ip_ranges.private_primary}"
-  private_secondary_ip_ranges = {
-    k8s_pods = {
-      ip_cidr_range = "${var.ip_ranges.private_k8s_pods}"
-      range_name    = format("private-k8spods-%s", var.name_suffix)
-    },
-    k8s_services = {
-      ip_cidr_range = "${var.ip_ranges.private_k8s_services}"
-      range_name    = format("private-k8ssvcs-%s", var.name_suffix)
-    },
-    redis = {
-      ip_cidr_range = "${var.ip_ranges.private_redis}" # must be /29 - See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
-      range_name    = format("private-redis-%s", var.name_suffix)
-    },
-    g_services = { # google service producers for CloudSQL, Firebase, Etc
-      ip_cidr_range = "${var.ip_ranges.private_g_services}"
-      range_name    = format("private-gservices-%s", var.name_suffix)
-    },
+  ip_ranges = {
+    public = { primary = var.ip_ranges.public_primary }
+    private = {
+      primary = var.ip_ranges.private_primary
+      k8s = {
+        pods = { range = var.ip_ranges.private_k8s_pods, name = format("private-k8spods-%s", var.name_suffix) }
+        svcs = { range = var.ip_ranges.private_k8s_services, name = format("private-k8ssvcs-%s", var.name_suffix) }
+      }
+      redis      = var.ip_ranges.private_redis      # must be /29 - See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
+      g_services = var.ip_ranges.private_g_services # google service producers for CloudSQL, Firebase, Etc
+    }
   }
   # Cloud NAT --------------------------------------------------------------------------------------
   cloud_router_name      = format("%s-%s", var.name_cloud_router, var.name_suffix)
@@ -40,8 +32,8 @@ locals {
   nat_ips                = local.nat_ip_allocate_option == "MANUAL_ONLY" ? google_compute_address.static_nat_ips.*.self_link : []
   # Google Services Peering ------------------------------------------------------------------------
   g_services_address_name          = format("%s-%s", var.name_g_services_address, var.name_suffix)
-  g_services_address_ip            = split("/", local.private_secondary_ip_ranges.g_services.ip_cidr_range)[0]
-  g_services_address_prefix_length = split("/", local.private_secondary_ip_ranges.g_services.ip_cidr_range)[1]
+  g_services_address_ip            = split("/", local.ip_ranges.private.g_services)[0]
+  g_services_address_prefix_length = split("/", local.ip_ranges.private.g_services)[1]
   # ------------------------------------------------------------------------------------------------
 }
 
@@ -70,7 +62,7 @@ resource "google_compute_subnetwork" "public_subnet" {
   network                  = google_compute_network.vpc.self_link
   region                   = data.google_client_config.google_client.region
   private_ip_google_access = true
-  ip_cidr_range            = local.ip_range_public_primary
+  ip_cidr_range            = local.ip_ranges.public.primary
   depends_on               = [google_project_service.networking_api]
   timeouts {
     create = var.subnet_timeout
@@ -86,14 +78,14 @@ resource "google_compute_subnetwork" "private_subnet" {
   region                   = data.google_client_config.google_client.region
   depends_on               = [google_project_service.networking_api]
   private_ip_google_access = true
-  ip_cidr_range            = local.ip_range_private_primary
+  ip_cidr_range            = local.ip_ranges.private.primary
   secondary_ip_range { # for k8s_pods
-    ip_cidr_range = local.private_secondary_ip_ranges.k8s_pods.ip_cidr_range
-    range_name    = local.private_secondary_ip_ranges.k8s_pods.range_name
+    ip_cidr_range = local.ip_ranges.private.k8s.pods.range
+    range_name    = local.ip_ranges.private.k8s.pods.name
   }
   secondary_ip_range { # for k8s_services
-    ip_cidr_range = local.private_secondary_ip_ranges.k8s_services.ip_cidr_range
-    range_name    = local.private_secondary_ip_ranges.k8s_services.range_name
+    ip_cidr_range = local.ip_ranges.private.k8s.svcs.range
+    range_name    = local.ip_ranges.private.k8s.svcs.name
   }
   timeouts {
     create = var.subnet_timeout

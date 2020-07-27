@@ -17,10 +17,28 @@ locals {
     public = { primary = var.ip_ranges.public_primary }
     private = {
       primary = var.ip_ranges.private_primary
-      k8s = {
-        pods = { range = var.ip_ranges.private_k8s_pods, name = format("private-k8spods-%s", var.name_suffix) }
-        svcs = { range = var.ip_ranges.private_k8s_services, name = format("private-k8ssvcs-%s", var.name_suffix) }
-      }
+      k8s = flatten(
+        [
+          for k8s_ip_ranges in var.ip_ranges.private_k8s : [
+            {
+              cidr = k8s_ip_ranges.pods
+              name = format(
+                "private-k8spods%s-%s",
+                index(var.ip_ranges.private_k8s, k8s_ip_ranges) == 0 ? "" /* for backward-compatibility */ : index(var.ip_ranges.private_k8s, k8s_ip_ranges) + 1,
+                var.name_suffix
+              )
+            },
+            {
+              cidr = k8s_ip_ranges.svcs
+              name = format(
+                "private-k8ssvcs%s-%s",
+                index(var.ip_ranges.private_k8s, k8s_ip_ranges) == 0 ? "" /* for backward-compatibility */ : index(var.ip_ranges.private_k8s, k8s_ip_ranges) + 1,
+                var.name_suffix
+              )
+            }
+          ]
+        ]
+      )
       redis      = var.ip_ranges.private_redis      # each CIDR range must be /29 - See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
       g_services = var.ip_ranges.private_g_services # google service producers for CloudSQL, Firebase, Etc
     }
@@ -79,13 +97,13 @@ resource "google_compute_subnetwork" "private_subnet" {
   depends_on               = [google_project_service.networking_api]
   private_ip_google_access = true
   ip_cidr_range            = local.ip_ranges.private.primary
-  secondary_ip_range { # for k8s_pods
-    ip_cidr_range = local.ip_ranges.private.k8s.pods.range
-    range_name    = local.ip_ranges.private.k8s.pods.name
-  }
-  secondary_ip_range { # for k8s_services
-    ip_cidr_range = local.ip_ranges.private.k8s.svcs.range
-    range_name    = local.ip_ranges.private.k8s.svcs.name
+  dynamic "secondary_ip_range" {
+    for_each = local.ip_ranges.private.k8s
+    iterator = k8s_object
+    content {
+      ip_cidr_range = k8s_object.value.cidr
+      range_name    = k8s_object.value.name
+    }
   }
   timeouts {
     create = var.subnet_timeout

@@ -28,14 +28,20 @@ output "cloud_nat_ips" {
   value       = google_compute_address.static_nat_ips.*.address
 }
 
-output "ip_range_name_private_k8s_pods" {
+output "ip_range_names_private_k8s_pods" {
   description = "Name of the private subnet IP range for k8s/GKE pods."
-  value       = local.ip_ranges.private.k8s.pods.name
+  value = [
+    for range_name in local.ip_ranges.private.k8s.*.name :
+    range_name if length(regexall("k8spods", range_name)) > 0 # contains "k8spods" in the name
+  ]
 }
 
-output "ip_range_name_private_k8s_services" {
+output "ip_range_names_private_k8s_services" {
   description = "Name of the private subnet IP range for k8s/GKE services."
-  value       = local.ip_ranges.private.k8s.svcs.name
+  value = [
+    for range_name in local.ip_ranges.private.k8s.*.name :
+    range_name if length(regexall("k8ssvcs", range_name)) > 0 # contains "k8ssvcs" in the name
+  ]
 }
 
 output "ip_ranges_private_redis_store" {

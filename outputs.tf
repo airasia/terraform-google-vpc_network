@@ -29,22 +29,22 @@ output "cloud_nat_ips" {
 }
 
 output "ip_range_name_private_k8s_pods" {
-  description = "Name of the private secondary IP range for k8s/GKE pods."
+  description = "Name of the private subnet IP range for k8s/GKE pods."
   value       = local.ip_ranges.private.k8s.pods.name
 }
 
 output "ip_range_name_private_k8s_services" {
-  description = "Name of the private secondary IP range for k8s/GKE services."
+  description = "Name of the private subnet IP range for k8s/GKE services."
   value       = local.ip_ranges.private.k8s.svcs.name
 }
 
 output "ip_range_private_redis_store" {
-  description = "Private secondary IP range for redis MemoryStore."
+  description = "Private subnet IP range for redis MemoryStore."
   value       = local.ip_ranges.private.redis
 }
 
 output "ip_range_private_g_services" {
-  description = "Private secondary IP range for Google service producers. Eg: CloudSQL, Firebase, Etc."
+  description = "Private subnet IP range for Google service producers. Eg: CloudSQL, Firebase, Etc."
   value       = local.ip_ranges.private.g_services
 }
 

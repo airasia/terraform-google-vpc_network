@@ -81,7 +81,10 @@ resource "google_compute_subnetwork" "private_subnet" {
     iterator = k8s_object
     content {
       ip_cidr_range = k8s_object.value.cidr
-      range_name    = format(k8s_object.value.name, k8s_object.value.serial > 1 ? k8s_object.value.serial : "") # for backward-compatibility
+      range_name = format(
+        k8s_object.value.name,
+        k8s_object.value.serial > 1 ? k8s_object.value.serial : "" # for backward-compatibility
+      )
     }
   }
   timeouts {

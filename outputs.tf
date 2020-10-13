@@ -67,6 +67,11 @@ output "ip_range_proxy_only" {
   value       = local.ip_ranges.proxy_only
 }
 
+output "ip_ranges_serverless_access" {
+  description = "IP ranges for zero or more Serverless VPC Access."
+  value       = local.ip_ranges.serverless_access
+}
+
 output "peered_google_services" {
   description = "The google services producers that are peered with the VPC."
   value = [

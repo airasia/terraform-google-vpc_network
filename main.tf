@@ -23,6 +23,7 @@ locals {
       g_services = var.ip_ranges.private_g_services # google service producers for CloudSQL, Firebase, Etc
     }
     proxy_only = (var.ip_ranges.proxy_only == "" || var.ip_ranges.proxy_only == null) ? "" : var.ip_ranges.proxy_only
+    serverless_access = var.ip_ranges.serverless_access
   }
   # Proxy-Only Subnet ------------------------------------------------------------------------------
   create_proxy_only_subnet = local.ip_ranges.proxy_only != "" ? true : false

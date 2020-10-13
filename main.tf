@@ -4,9 +4,9 @@ terraform {
 
 locals {
   # VPC Net/Subnet names ---------------------------------------------------------------------------
-  vpc_name            = format("%s-%s", var.name_vpc_network, var.name_suffix)
-  subnet_name_public  = format("%s-%s-%s", var.name_public_subnets, "%s", var.name_suffix)
-  subnet_name_private = format("%s-%s", var.name_private_subnet, var.name_suffix)
+  vpc_name               = format("%s-%s", var.name_vpc_network, var.name_suffix)
+  subnet_name_public     = format("%s-%s-%s", var.name_public_subnets, "%s", var.name_suffix)
+  subnet_name_private    = format("%s-%s", var.name_private_subnet, var.name_suffix)
   subnet_name_proxy_only = format("%s-%s", var.name_proxy_only_subnet, var.name_suffix)
   # VPC IP ranges ----------------------------------------------------------------------------------
   ip_ranges = {
@@ -100,16 +100,16 @@ resource "google_compute_subnetwork" "private_subnet" {
 }
 
 resource "google_compute_subnetwork" "proxy_only_subnet" {
-  count                    = local.create_proxy_only_subnet ? 1 : 0
-  provider                 = google-beta
-  name                     = local.subnet_name_proxy_only
-  description              = var.proxy_only_subnet_description
-  network                  = google_compute_network.vpc.self_link
-  region                   = data.google_client_config.google_client.region
-  ip_cidr_range            = local.ip_ranges.proxy_only
-  purpose                  = "INTERNAL_HTTPS_LOAD_BALANCER" # required for proxy-only subnets - see https://www.terraform.io/docs/providers/google/r/compute_subnetwork.html
-  role                     = "ACTIVE"                       # used when purpose = INTERNAL_HTTPS_LOAD_BALANCER - see https://www.terraform.io/docs/providers/google/r/compute_subnetwork.html
-  depends_on               = [google_project_service.networking_api]
+  count         = local.create_proxy_only_subnet ? 1 : 0
+  provider      = google-beta
+  name          = local.subnet_name_proxy_only
+  description   = var.proxy_only_subnet_description
+  network       = google_compute_network.vpc.self_link
+  region        = data.google_client_config.google_client.region
+  ip_cidr_range = local.ip_ranges.proxy_only
+  purpose       = "INTERNAL_HTTPS_LOAD_BALANCER" # required for proxy-only subnets - see https://www.terraform.io/docs/providers/google/r/compute_subnetwork.html
+  role          = "ACTIVE"                       # used when purpose = INTERNAL_HTTPS_LOAD_BALANCER - see https://www.terraform.io/docs/providers/google/r/compute_subnetwork.html
+  depends_on    = [google_project_service.networking_api]
   timeouts {
     create = var.subnet_timeout
     update = var.subnet_timeout

@@ -62,6 +62,11 @@ output "ip_range_private_g_services" {
   value       = local.ip_ranges.private.g_services
 }
 
+output "ip_range_proxy_only" {
+  description = "IP range of proxy_only subnet that enables internal HTTP(S) load balancing. See https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balance-ingress#step_3_deploy_a_service_as_a_network_endpoint_group_neg"
+  value       = local.ip_ranges.proxy_only
+}
+
 output "peered_google_services" {
   description = "The google services producers that are peered with the VPC."
   value = [

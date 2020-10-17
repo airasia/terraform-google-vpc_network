@@ -26,7 +26,7 @@ locals {
     serverless_access = var.ip_ranges.serverless_access
   }
   # Proxy-Only Subnet ------------------------------------------------------------------------------
-  create_proxy_only_subnet = local.ip_ranges.proxy_only != "" ? true : false
+  create_proxy_only_subnet = local.ip_ranges.proxy_only == "" ? false : true
   # Cloud NAT --------------------------------------------------------------------------------------
   cloud_router_name      = format("%s-%s", var.name_cloud_router, var.name_suffix)
   cloud_nat_name         = format("%s-%s", var.name_cloud_nat, var.name_suffix)

@@ -140,12 +140,8 @@ resource "google_compute_router_nat" "cloud_nat" {
   name                               = local.cloud_nat_name
   router                             = google_compute_router.cloud_router.name
   region                             = google_compute_subnetwork.private_subnet.region
-  source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
   depends_on                         = [google_project_service.networking_api]
-  subnetwork {
-    name                    = google_compute_subnetwork.private_subnet.self_link
-    source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
-  }
   nat_ip_allocate_option = local.nat_ip_allocate_option
   nat_ips                = local.nat_ips
   log_config {

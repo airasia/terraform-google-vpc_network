@@ -121,9 +121,9 @@ resource "google_compute_subnetwork" "proxy_only_subnet" {
 }
 
 resource "google_compute_router" "cloud_router" {
-  name       = local.cloud_router_name
-  network    = google_compute_network.vpc.self_link
-  region     = google_compute_subnetwork.private_subnet.region
+  name    = local.cloud_router_name
+  network = google_compute_network.vpc.self_link
+  region  = google_compute_subnetwork.private_subnet.region
   timeouts {
     create = var.router_timeout
     update = var.router_timeout

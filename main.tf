@@ -39,6 +39,11 @@ locals {
   # ------------------------------------------------------------------------------------------------
 }
 
+resource "google_project_service" "compute_api" {
+  service            = "compute.googleapis.com"
+  disable_on_destroy = false
+}
+
 resource "google_project_service" "networking_api" {
   service            = "servicenetworking.googleapis.com"
   disable_on_destroy = false
@@ -50,7 +55,7 @@ resource "google_compute_network" "vpc" {
   routing_mode                    = var.vpc_routing_mode
   auto_create_subnetworks         = false
   delete_default_routes_on_create = false
-  depends_on                      = [google_project_service.networking_api]
+  depends_on                      = [google_project_service.compute_api, google_project_service.networking_api]
   timeouts {
     create = var.vpc_timeout
     update = var.vpc_timeout

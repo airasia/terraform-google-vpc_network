@@ -66,7 +66,6 @@ resource "google_compute_subnetwork" "public_subnets" {
   region                   = data.google_client_config.google_client.region
   private_ip_google_access = true
   ip_cidr_range            = each.value
-  depends_on               = [google_project_service.networking_api]
   timeouts {
     create = var.subnet_timeout
     update = var.subnet_timeout
@@ -79,7 +78,6 @@ resource "google_compute_subnetwork" "private_subnet" {
   description              = var.private_subnet_description
   network                  = google_compute_network.vpc.self_link
   region                   = data.google_client_config.google_client.region
-  depends_on               = [google_project_service.networking_api]
   private_ip_google_access = true
   ip_cidr_range            = local.ip_ranges.private.primary
   dynamic "secondary_ip_range" {
@@ -110,7 +108,6 @@ resource "google_compute_subnetwork" "proxy_only_subnet" {
   ip_cidr_range = local.ip_ranges.proxy_only
   purpose       = "INTERNAL_HTTPS_LOAD_BALANCER" # required for proxy-only subnets - see https://www.terraform.io/docs/providers/google/r/compute_subnetwork.html
   role          = "ACTIVE"                       # used when purpose = INTERNAL_HTTPS_LOAD_BALANCER - see https://www.terraform.io/docs/providers/google/r/compute_subnetwork.html
-  depends_on    = [google_project_service.networking_api]
   timeouts {
     create = var.subnet_timeout
     update = var.subnet_timeout
@@ -122,7 +119,6 @@ resource "google_compute_router" "cloud_router" {
   name       = local.cloud_router_name
   network    = google_compute_network.vpc.self_link
   region     = google_compute_subnetwork.private_subnet.region
-  depends_on = [google_compute_subnetwork.private_subnet, google_project_service.networking_api]
   timeouts {
     create = var.router_timeout
     update = var.router_timeout
@@ -141,7 +137,6 @@ resource "google_compute_router_nat" "cloud_nat" {
   router                             = google_compute_router.cloud_router.name
   region                             = google_compute_subnetwork.private_subnet.region
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-  depends_on                         = [google_project_service.networking_api]
   nat_ip_allocate_option             = local.nat_ip_allocate_option
   nat_ips                            = local.nat_ips
   log_config {
@@ -165,14 +160,12 @@ resource "google_compute_global_address" "g_services_address" {
   address       = local.g_services_address_ip
   prefix_length = local.g_services_address_prefix_length
   network       = google_compute_network.vpc.self_link
-  depends_on    = [google_project_service.networking_api]
 }
 
 resource "google_service_networking_connection" "g_services_connection" {
   network                 = google_compute_network.vpc.self_link
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.g_services_address.name]
-  depends_on              = [google_project_service.networking_api]
 }
 
 data "google_client_config" "google_client" {}

@@ -8,6 +8,11 @@ output "name" {
   value       = local.vpc_name
 }
 
+output "network_id" {
+  description = "The identifier of the VPC network with format projects/{{project}}/global/networks/{{name}}."
+  value       = google_compute_network.vpc.id
+}
+
 output "public_subnets" {
   description = "References (self_link) to the Public SubNetworks."
   value = [

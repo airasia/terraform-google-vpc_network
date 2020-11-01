@@ -3,7 +3,7 @@ output "network" {
   value       = google_compute_network.vpc.self_link
 }
 
-output "name" {
+output "network_name" {
   description = "The generated name of the VPC network."
   value       = local.vpc_name
 }

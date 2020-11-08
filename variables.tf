@@ -17,7 +17,6 @@ variable "ip_ranges" {
     public             = list(string)                                   # list of CIDR ranges - each with their /x parts (/16 advised) for public subnets of the VPC.
     private_primary    = string                                         # a CIDR range including /x part (/16 advised) for primary IPs in private subnet of the VPC.
     private_k8s        = list(object({ pods = string, svcs = string })) # list of objects of CIDR ranges - each with their /x parts (/16 advised) - for pods & services in a k8s cluster.
-    private_redis      = list(string)                                   # list of CIDR ranges - each with their /x parts (/29 required) - for Redis. See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
     private_g_services = string                                         # a CIDR range including /x part (/16 advised) for Google services producers (like CloudSQL, Firebase, etc) in private subnet of the VPC.
     proxy_only         = string                                         # an empty string or a CIDR range including /x part (/26 advised) for Proxy-Only subnet. Use empty string "" to avoid creating Proxy-Only subnet. See https://cloud.google.com/load-balancing/docs/l7-internal/proxy-only-subnets#proxy_only_subnet_create
     serverless_access  = list(string)                                   # list of CIDR ranges - each with their /x parts (/28 required) for Serverless VPC Access. See https://www.terraform.io/docs/providers/google/r/vpc_access_connector.html#ip_cidr_range

@@ -19,7 +19,6 @@ locals {
           { serial = index(var.ip_ranges.private_k8s, k8s_ip_ranges) + 1, cidr = k8s_ip_ranges.svcs, name = format("private-k8ssvcs%s-%s", "%s", var.name_suffix) }
         ]
       ])
-      redis      = var.ip_ranges.private_redis      # each CIDR range must be /29 - See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
       g_services = var.ip_ranges.private_g_services # google service producers for CloudSQL, Firebase, Etc
     }
     proxy_only        = (var.ip_ranges.proxy_only == "" || var.ip_ranges.proxy_only == null) ? "" : var.ip_ranges.proxy_only

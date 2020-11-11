@@ -67,7 +67,7 @@ output "ip_range_private_g_services" {
 
 output "ip_range_proxy_only" {
   description = "IP range of proxy_only subnet that enables internal HTTP(S) load balancing. See https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balance-ingress#step_3_deploy_a_service_as_a_network_endpoint_group_neg"
-  value       = local.ip_ranges.proxy_only
+  value       = local.create_proxy_only_subnet ? google_compute_subnetwork.proxy_only_subnet.0.ip_cidr_range : null
 }
 
 output "ip_ranges_serverless_access" {

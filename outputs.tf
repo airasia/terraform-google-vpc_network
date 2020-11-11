@@ -56,6 +56,11 @@ output "ip_range_names_private_k8s_services" {
   ]
 }
 
+output "ip_ranges_private_redis_store" {
+  description = "List of private subnet IP ranges for redis MemoryStore."
+  value       = local.ip_ranges.private.redis
+}
+
 output "ip_range_private_g_services" {
   description = "Private subnet IP range for Google service producers. Eg: CloudSQL, Firebase, Redis, Memcache Etc."
   value = format(

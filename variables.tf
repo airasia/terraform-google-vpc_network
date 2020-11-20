@@ -12,7 +12,7 @@ variable "name_suffix" {
 }
 
 variable "ip_ranges" {
-  description = "A map of IP CIDR ranges (including their /x parts) that should be used by the public/private subnets for the various components of the infrastructure. See comments in source code for elaboration on accepted keys."
+  description = "A map of IP CIDR ranges (including their /x parts) that should be used by the public/private subnets for the various components of the infrastructure. See comments in source code for elaboration on accepted keys. Can use an IP calculator (like https://www.calculator.net/ip-subnet-calculator.html) for help with calculating subnets & IP ranges."
   type = object({
     public             = list(string)                                   # list of CIDR ranges - each with their /x parts (/24 advised) for public subnets of the VPC.
     private_primary    = string                                         # a CIDR range including /x part (/24 advised) for primary IPs in private subnet of the VPC.

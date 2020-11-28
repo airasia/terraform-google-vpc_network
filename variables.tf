@@ -76,6 +76,12 @@ variable "name_static_nat_ips" {
   default     = "nat-manual-ip"
 }
 
+variable "nat_min_ports_per_vm" {
+  description = "Minimum number of ports allocated to a VM from the NAT. https://cloud.google.com/nat/docs/ports-and-addresses#ports-and-connections. The number of NAT source IP address and source port tuples that a Cloud NAT gateway reserves for a VM limits the number of connections that the VM can make to a unique destination. https://cloud.google.com/nat/docs/ports-and-addresses#port-reservation-examples. Each nat ip supports 65536 ports. If min ip per vm is 2048, then total number of vms that can be attached to the nat is (nat static ip count) * 65566 / 2048 = 32."
+  type        = number
+  default     = 64
+}
+
 variable "vpc_description" {
   description = "The description of the VPC Network."
   type        = string

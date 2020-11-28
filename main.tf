@@ -144,6 +144,7 @@ resource "google_compute_router_nat" "cloud_nat" {
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
   nat_ip_allocate_option             = local.nat_ip_allocate_option
   nat_ips                            = local.nat_ips
+  min_ports_per_vm                   = var.nat_min_ports_per_vm
   log_config {
     # If the NAT gateway runs out of NAT IP addresses, Cloud NAT drops packets.
     # Dropped packets are logged when error logging is turned on for Cloud NAT logging.

@@ -15,8 +15,34 @@ locals {
       primary = var.ip_ranges.private_primary
       k8s = flatten([
         for k8s_ip_ranges in var.ip_ranges.private_k8s : [
-          { serial = index(var.ip_ranges.private_k8s, k8s_ip_ranges) + 1, cidr = k8s_ip_ranges.pods, name = format("private-k8spods%s-%s", "%s", var.name_suffix) },
-          { serial = index(var.ip_ranges.private_k8s, k8s_ip_ranges) + 1, cidr = k8s_ip_ranges.svcs, name = format("private-k8ssvcs%s-%s", "%s", var.name_suffix) }
+          {
+            cidr = k8s_ip_ranges.pods,
+            name = (k8s_ip_ranges.name != "") ? (
+              format("%s-pods-%s", k8s_ip_ranges.name, var.name_suffix)
+              ) : (
+              format(
+                "private-k8spods%s-%s",
+                (index(var.ip_ranges.private_k8s, k8s_ip_ranges) > 0) ? (
+                  index(var.ip_ranges.private_k8s, k8s_ip_ranges) + 1
+                ) : "",
+                var.name_suffix
+              )
+            )
+          },
+          {
+            cidr = k8s_ip_ranges.svcs,
+            name = (k8s_ip_ranges.name != "") ? (
+              format("%s-svcs-%s", k8s_ip_ranges.name, var.name_suffix)
+              ) : (
+              format(
+                "private-k8ssvcs%s-%s",
+                (index(var.ip_ranges.private_k8s, k8s_ip_ranges) > 0) ? (
+                  index(var.ip_ranges.private_k8s, k8s_ip_ranges) + 1
+                ) : "",
+                var.name_suffix
+              )
+            )
+          }
         ]
       ])
       redis      = var.ip_ranges.private_redis      # each CIDR range must be /29 - See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
@@ -90,10 +116,7 @@ resource "google_compute_subnetwork" "private_subnet" {
     iterator = k8s_object
     content {
       ip_cidr_range = k8s_object.value.cidr
-      range_name = format(
-        k8s_object.value.name,
-        k8s_object.value.serial > 1 ? k8s_object.value.serial : "" # for backward-compatibility
-      )
+      range_name    = k8s_object.value.name
     }
   }
   timeouts {

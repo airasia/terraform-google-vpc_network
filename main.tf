@@ -197,4 +197,17 @@ resource "google_service_networking_connection" "g_services_connection" {
   reserved_peering_ranges = [google_compute_global_address.g_services_address.name]
 }
 
+resource "google_compute_global_address" "global_external_ip" {
+  for_each   = { for obj in var.external_ips_global : obj.name => obj }
+  name       = lookup(each.value, "backward_compatible_fullname", format("%s-%s", each.value.name, var.name_suffix))
+  depends_on = [google_project_service.compute_api, google_project_service.networking_api]
+}
+
+resource "google_compute_address" "regional_external_ip" {
+  for_each   = { for obj in var.external_ips_regional : obj.name => obj }
+  name       = lookup(each.value, "backward_compatible_fullname", format("%s-%s", each.value.name, var.name_suffix))
+  region     = lookup(each.value, "region", data.google_client_config.google_client.region)
+  depends_on = [google_project_service.compute_api, google_project_service.networking_api]
+}
+
 data "google_client_config" "google_client" {}

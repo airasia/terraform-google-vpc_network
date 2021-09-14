@@ -86,3 +86,23 @@ output "peered_google_services" {
     google_service_networking_connection.g_services_connection.peering
   ]
 }
+
+output "global_external_ips" {
+  description = ""
+  value =  { for ip_alias, ip_obj in google_compute_global_address.global_external_ip : 
+    ip_alias => {
+      name    = ip_obj.name
+      address = ip_obj.address
+    }
+  }
+}
+
+output "regional_external_ips" {
+  description = ""
+  value =  { for ip_alias, ip_obj in google_compute_address.regional_external_ip :
+    ip_alias => {
+      name    = ip_obj.name
+      address = ip_obj.address
+    }
+  }
+}

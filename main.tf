@@ -5,12 +5,10 @@ terraform {
 locals {
   # VPC Net/Subnet names ---------------------------------------------------------------------------
   vpc_name               = format("%s-%s", var.name_vpc_network, var.name_suffix)
-  subnet_name_public     = format("%s-%s-%s", var.name_public_subnets, "%s", var.name_suffix)
   subnet_name_private    = format("%s-%s", var.name_private_subnet, var.name_suffix)
   subnet_name_proxy_only = format("%s-%s", var.name_proxy_only_subnet, var.name_suffix)
   # VPC IP ranges ----------------------------------------------------------------------------------
   ip_ranges = {
-    public = tolist(toset(var.ip_ranges.public))
     private = {
       primary = var.ip_ranges.private_primary
       k8s = flatten([
@@ -86,21 +84,6 @@ resource "google_compute_network" "vpc" {
     create = var.vpc_timeout
     update = var.vpc_timeout
     delete = var.vpc_timeout
-  }
-}
-
-resource "google_compute_subnetwork" "public_subnets" {
-  for_each                 = toset(local.ip_ranges.public)
-  name                     = format(local.subnet_name_public, index(local.ip_ranges.public, each.value) + 1)
-  description              = var.public_subnet_description
-  network                  = google_compute_network.vpc.self_link
-  region                   = data.google_client_config.google_client.region
-  private_ip_google_access = true
-  ip_cidr_range            = each.value
-  timeouts {
-    create = var.subnet_timeout
-    update = var.subnet_timeout
-    delete = var.subnet_timeout
   }
 }
 

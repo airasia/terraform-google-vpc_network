@@ -15,31 +15,11 @@ locals {
         for k8s_ip_ranges in var.ip_ranges.private_k8s : [
           {
             cidr = k8s_ip_ranges.pods,
-            name = (k8s_ip_ranges.name != "") ? (
-              format("%s-pods-%s", k8s_ip_ranges.name, var.name_suffix)
-              ) : (
-              format(
-                "private-k8spods%s-%s",
-                (index(var.ip_ranges.private_k8s, k8s_ip_ranges) > 0) ? (
-                  index(var.ip_ranges.private_k8s, k8s_ip_ranges) + 1
-                ) : "",
-                var.name_suffix
-              )
-            )
+            name = format("%s-k8spods-%s", coalesce(k8s_ip_ranges.name, "private"), var.name_suffix)
           },
           {
             cidr = k8s_ip_ranges.svcs,
-            name = (k8s_ip_ranges.name != "") ? (
-              format("%s-svcs-%s", k8s_ip_ranges.name, var.name_suffix)
-              ) : (
-              format(
-                "private-k8ssvcs%s-%s",
-                (index(var.ip_ranges.private_k8s, k8s_ip_ranges) > 0) ? (
-                  index(var.ip_ranges.private_k8s, k8s_ip_ranges) + 1
-                ) : "",
-                var.name_suffix
-              )
-            )
+            name = format("%s-k8ssvcs-%s", coalesce(k8s_ip_ranges.name, "private"), var.name_suffix)
           }
         ]
       ])

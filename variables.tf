@@ -23,7 +23,7 @@ variable "ip_ranges" {
 
   "private_g_services": A CIDR range (/20 advised) for Google services producers (like CloudSQL, Firebase, etc) in private subnet of the VPC. See https://cloud.google.com/vpc/docs/configure-private-services-access#allocating-range. See https://cloud.google.com/sql/docs/mysql/configure-private-services-access#configure-access.
 
-  "proxy_only": An empty string or a CIDR range (/24 advised) for Proxy-Only subnet. Use empty string "" to avoid creating Proxy-Only subnet. See https://cloud.google.com/load-balancing/docs/l7-internal/proxy-only-subnets#proxy_only_subnet_create
+  "proxy_only": An empty string or a CIDR range (/24 advised) for Proxy-Only subnet. Use empty string "" or specify null to avoid creating Proxy-Only subnet. See https://cloud.google.com/load-balancing/docs/l7-internal/proxy-only-subnets#proxy_only_subnet_create
 
   "serverless_access": list of CIDR ranges (/28 required) for Serverless VPC Access. Use empty list [] to avoid reserving CIDR range for serverless_access. See https://www.terraform.io/docs/providers/google/r/vpc_access_connector.html#ip_cidr_range. See https://cloud.google.com/vpc/docs/configure-serverless-vpc-access#create-connector
   
@@ -74,7 +74,7 @@ variable "name_cloud_nat" {
 }
 
 variable "name_g_services_address" {
-  description = "Portion of name to be generated for the static GServices IP address."
+  description = "Portion of name to be generated for the internal IP address that will be created to expose Google services producers (like CloudSQL, Firebase, etc)."
   type        = string
   default     = "gservices-address"
 }

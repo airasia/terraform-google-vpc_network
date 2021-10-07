@@ -12,15 +12,30 @@ variable "name_suffix" {
 }
 
 variable "ip_ranges" {
-  description = "A map of IP CIDR ranges (including their /x parts) that should be used by the public/private subnets for the various components of the infrastructure. See comments in source code for elaboration on accepted keys and suggested IP CIDR ranges. Can use an IP calculator (like https://www.calculator.net/ip-subnet-calculator.html) for help with calculating subnets & IP ranges."
+  description = <<-EOT
+  A map of CIDR IP ranges (including their /x parts) that should be reserved by the VPC for various purposes.
+
+  "private_primary": A CIDR range (/20 advised) for IPs used by VMs / GKE nodes that are provisioned in the private subnet of the VPC. See https://cloud.google.com/kubernetes-engine/docs/concepts/alias-ips#cluster_sizing_primary_range
+
+  "private_k8s": List of objects containing name & CIDR ranges for pods (/21 advised) & for services (/24 advised) used in a k8s cluster. See https://cloud.google.com/kubernetes-engine/docs/concepts/alias-ips#defaults_limits
+
+  "private_redis": List of CIDR ranges (/29 advised) for Redis instances. Not required for redis instances that use the recommended "PRIVATE_SERVICE_ACCESS" mode. See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range. See https://cloud.google.com/memorystore/docs/redis/networking#connection_modes.
+
+  "private_g_services": A CIDR range (/20 advised) for Google services producers (like CloudSQL, Firebase, etc) in private subnet of the VPC. See https://cloud.google.com/vpc/docs/configure-private-services-access#allocating-range. See https://cloud.google.com/sql/docs/mysql/configure-private-services-access#configure-access.
+
+  "proxy_only": An empty string or a CIDR range (/24 advised) for Proxy-Only subnet. Use empty string "" or specify null to avoid creating Proxy-Only subnet. See https://cloud.google.com/load-balancing/docs/l7-internal/proxy-only-subnets#proxy_only_subnet_create
+
+  "serverless_access": list of CIDR ranges (/28 required) for Serverless VPC Access. Use empty list [] to avoid reserving CIDR range for serverless_access. See https://www.terraform.io/docs/providers/google/r/vpc_access_connector.html#ip_cidr_range. See https://cloud.google.com/vpc/docs/configure-serverless-vpc-access#create-connector
+  
+  You can always use an IP calculator like https://www.calculator.net/ip-subnet-calculator.html or https://www.davidc.net/sites/default/subnets/subnets.html for help with calculating subnets & IP ranges.
+  EOT
   type = object({
-    public             = list(string)                                                  # list of CIDR ranges - each with their /x parts (/20 advised) for public subnets of the VPC.
-    private_primary    = string                                                        # a CIDR range including /x part (/20 advised) for primary IPs in private subnet of the VPC.
-    private_k8s        = list(object({ name = string, pods = string, svcs = string })) # list of objects of CIDR ranges - each with their /x parts (/20 advised) - for pods & services in a k8s cluster.
-    private_redis      = list(string)                                                  # list of CIDR ranges - each with their /x parts (/29 advised) - for Redis. See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
-    private_g_services = string                                                        # a CIDR range including /x part (/20 advised) for Google services producers (like CloudSQL, Firebase, etc) in private subnet of the VPC.
-    proxy_only         = string                                                        # an empty string or a CIDR range including /x part (/24 advised) for Proxy-Only subnet. Use empty string "" to avoid creating Proxy-Only subnet. See https://cloud.google.com/load-balancing/docs/l7-internal/proxy-only-subnets#proxy_only_subnet_create
-    serverless_access  = list(string)                                                  # list of CIDR ranges - each with their /x parts (/28 advised) for Serverless VPC Access. See https://www.terraform.io/docs/providers/google/r/vpc_access_connector.html#ip_cidr_range
+    private_primary    = string
+    private_k8s        = list(object({ name = string, pods = string, svcs = string }))
+    private_redis      = list(string)
+    private_g_services = string
+    proxy_only         = string
+    serverless_access  = list(string)
   })
 }
 
@@ -32,12 +47,6 @@ variable "name_vpc_network" {
   description = "Portion of name to be generated for the VPC network."
   type        = string
   default     = "vpc-network"
-}
-
-variable "name_public_subnets" {
-  description = "Common portion of names to be generated for the public subnets."
-  type        = string
-  default     = "public-subnet"
 }
 
 variable "name_private_subnet" {
@@ -65,7 +74,7 @@ variable "name_cloud_nat" {
 }
 
 variable "name_g_services_address" {
-  description = "Portion of name to be generated for the static GServices IP address."
+  description = "Portion of name to be generated for the internal IP address that will be created to expose Google services producers (like CloudSQL, Firebase, etc)."
   type        = string
   default     = "gservices-address"
 }
@@ -86,12 +95,6 @@ variable "vpc_description" {
   description = "The description of the VPC Network."
   type        = string
   default     = "Generated by Terraform"
-}
-
-variable "public_subnet_description" {
-  description = "The description of the public subnet."
-  type        = string
-  default     = "Generated by Terraform for public use"
 }
 
 variable "private_subnet_description" {

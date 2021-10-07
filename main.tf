@@ -5,51 +5,29 @@ terraform {
 locals {
   # VPC Net/Subnet names ---------------------------------------------------------------------------
   vpc_name               = format("%s-%s", var.name_vpc_network, var.name_suffix)
-  subnet_name_public     = format("%s-%s-%s", var.name_public_subnets, "%s", var.name_suffix)
   subnet_name_private    = format("%s-%s", var.name_private_subnet, var.name_suffix)
   subnet_name_proxy_only = format("%s-%s", var.name_proxy_only_subnet, var.name_suffix)
   # VPC IP ranges ----------------------------------------------------------------------------------
   ip_ranges = {
-    public = tolist(toset(var.ip_ranges.public))
     private = {
       primary = var.ip_ranges.private_primary
       k8s = flatten([
         for k8s_ip_ranges in var.ip_ranges.private_k8s : [
           {
             cidr = k8s_ip_ranges.pods,
-            name = (k8s_ip_ranges.name != "") ? (
-              format("%s-pods-%s", k8s_ip_ranges.name, var.name_suffix)
-              ) : (
-              format(
-                "private-k8spods%s-%s",
-                (index(var.ip_ranges.private_k8s, k8s_ip_ranges) > 0) ? (
-                  index(var.ip_ranges.private_k8s, k8s_ip_ranges) + 1
-                ) : "",
-                var.name_suffix
-              )
-            )
+            name = format("%s-k8spods-%s", coalesce(k8s_ip_ranges.name, "private"), var.name_suffix)
           },
           {
             cidr = k8s_ip_ranges.svcs,
-            name = (k8s_ip_ranges.name != "") ? (
-              format("%s-svcs-%s", k8s_ip_ranges.name, var.name_suffix)
-              ) : (
-              format(
-                "private-k8ssvcs%s-%s",
-                (index(var.ip_ranges.private_k8s, k8s_ip_ranges) > 0) ? (
-                  index(var.ip_ranges.private_k8s, k8s_ip_ranges) + 1
-                ) : "",
-                var.name_suffix
-              )
-            )
+            name = format("%s-k8ssvcs-%s", coalesce(k8s_ip_ranges.name, "private"), var.name_suffix)
           }
         ]
       ])
-      redis      = var.ip_ranges.private_redis      # each CIDR range must be /29 - See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range
-      g_services = var.ip_ranges.private_g_services # google service producers for CloudSQL, Firebase, Etc
+      redis      = var.ip_ranges.private_redis # Only reserved here for visibility. Not used in this module.
+      g_services = var.ip_ranges.private_g_services
     }
-    proxy_only        = (var.ip_ranges.proxy_only == "" || var.ip_ranges.proxy_only == null) ? "" : var.ip_ranges.proxy_only
-    serverless_access = var.ip_ranges.serverless_access
+    proxy_only        = coalesce(var.ip_ranges.proxy_only, "")
+    serverless_access = var.ip_ranges.serverless_access # Only reserved here for visibility. Not used in this module.
   }
   # Proxy-Only Subnet ------------------------------------------------------------------------------
   create_proxy_only_subnet = local.ip_ranges.proxy_only == "" ? false : true
@@ -86,21 +64,6 @@ resource "google_compute_network" "vpc" {
     create = var.vpc_timeout
     update = var.vpc_timeout
     delete = var.vpc_timeout
-  }
-}
-
-resource "google_compute_subnetwork" "public_subnets" {
-  for_each                 = toset(local.ip_ranges.public)
-  name                     = format(local.subnet_name_public, index(local.ip_ranges.public, each.value) + 1)
-  description              = var.public_subnet_description
-  network                  = google_compute_network.vpc.self_link
-  region                   = data.google_client_config.google_client.region
-  private_ip_google_access = true
-  ip_cidr_range            = each.value
-  timeouts {
-    create = var.subnet_timeout
-    update = var.subnet_timeout
-    delete = var.subnet_timeout
   }
 }
 

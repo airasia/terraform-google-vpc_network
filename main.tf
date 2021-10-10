@@ -26,7 +26,7 @@ locals {
       redis      = var.ip_ranges.private_redis # Only reserved here for visibility. Not used in this module.
       g_services = var.ip_ranges.private_g_services
     }
-    proxy_only        = coalesce(var.ip_ranges.proxy_only, "")
+    proxy_only        = var.ip_ranges.proxy_only == null ? "" : var.ip_ranges.proxy_only
     serverless_access = var.ip_ranges.serverless_access # Only reserved here for visibility. Not used in this module.
   }
   # Proxy-Only Subnet ------------------------------------------------------------------------------

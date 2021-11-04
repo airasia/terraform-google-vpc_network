@@ -17,7 +17,7 @@ variable "ip_ranges" {
 
   "private_primary": A CIDR range (/20 advised) for IPs used by VMs / GKE nodes that are provisioned in the private subnet of the VPC. See https://cloud.google.com/kubernetes-engine/docs/concepts/alias-ips#cluster_sizing_primary_range
 
-  "private_k8s": List of objects containing name & CIDR ranges for pods (/21 advised) & for services (/24 advised) used in a k8s cluster. See https://cloud.google.com/kubernetes-engine/docs/concepts/alias-ips#defaults_limits
+  "private_k8s": List of objects containing name & CIDR ranges for pods (/20 advised) (see https://cloud.google.com/kubernetes-engine/docs/concepts/alias-ips#cluster_sizing_secondary_range_pods) & for services (/24 advised) (see https://cloud.google.com/kubernetes-engine/docs/concepts/alias-ips#cluster_sizing_secondary_range_svcs) used in a k8s cluster.
 
   "private_redis": List of CIDR ranges (/29 advised) for Redis instances. Not required for redis instances that use the recommended "PRIVATE_SERVICE_ACCESS" mode. See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range. See https://cloud.google.com/memorystore/docs/redis/networking#connection_modes.
 

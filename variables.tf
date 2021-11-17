@@ -166,8 +166,8 @@ variable "external_ips_global" {
   This field is NOT RECOMMENDED for generating new external IPs. Can ignore declaring this field if
   not required.
   EOT
-  type    = list(map(string))
-  default = []
+  type        = list(map(string))
+  default     = []
 }
 
 variable "external_ips_regional" {
@@ -189,6 +189,6 @@ variable "external_ips_regional" {
   the Google provider's region if this field is ignored. See
   https://cloud.google.com/compute/docs/regions-zones#available for choice of region values.
   EOT
-  type    = list(map(string))
-  default = []
+  type        = list(map(string))
+  default     = []
 }

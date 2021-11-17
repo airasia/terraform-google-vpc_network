@@ -91,6 +91,12 @@ variable "nat_min_ports_per_vm" {
   default     = 64
 }
 
+variable "nat_enable_endpoint_independent_mapping" {
+  type        = bool
+  description = "Specifies if endpoint independent mapping is enabled. See https://cloud.google.com/nat/docs/overview#specs-rfcs"
+  default     = false
+}
+
 variable "vpc_description" {
   description = "The description of the VPC Network."
   type        = string
@@ -160,8 +166,8 @@ variable "external_ips_global" {
   This field is NOT RECOMMENDED for generating new external IPs. Can ignore declaring this field if
   not required.
   EOT
-  type    = list(map(string))
-  default = []
+  type        = list(map(string))
+  default     = []
 }
 
 variable "external_ips_regional" {
@@ -183,6 +189,6 @@ variable "external_ips_regional" {
   the Google provider's region if this field is ignored. See
   https://cloud.google.com/compute/docs/regions-zones#available for choice of region values.
   EOT
-  type    = list(map(string))
-  default = []
+  type        = list(map(string))
+  default     = []
 }

@@ -122,9 +122,15 @@ variable "vpc_routing_mode" {
 }
 
 variable "num_of_static_nat_ips" {
-  description = "The number of static/manual external IPs that should be reserved by Cloud NAT. Useful when private instances need to communicate with the internet using specific external IPs that maybe whitelisted by 3rd party services."
+  description = "The number of static/manual IPs that should be created for the Cloud NAT. Useful when private instances need to communicate with the internet using specific external IPs that must be allowlisted by 3rd party services. The number of IPs created here will be attached (or detached) to the Cloud NAT based on the value of \"var.nat_attach_manual_ips\"."
   type        = number
   default     = 1
+}
+
+variable "nat_attach_manual_ips" {
+  description = "This value decides whether (or not) (or how many of) the manual IPs created via \"var.num_of_static_nat_ips\" should be attached to the Cloud NAT. Acceptable values are \"ALL\" or \"NONE\" or a string decimal number (eg: \"1\", \"2\", \"11\" etc). Setting a number will attach only the first n number of IPs created via \"var.num_of_static_nat_ips\" allowing you to pre-provision manual NAT IPs before actually attaching them to Cloud NAT."
+  type        = string
+  default     = "ALL"
 }
 
 variable "vpc_timeout" {

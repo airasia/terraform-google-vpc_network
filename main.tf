@@ -35,9 +35,9 @@ locals {
   cloud_router_name      = format("%s-%s", var.name_cloud_router, var.name_suffix)
   cloud_nat_name         = format("%s-%s", var.name_cloud_nat, var.name_suffix)
   nat_ip_allocate_option = (
-    var.nat_attach_manual_ips == "NONE" ? "AUTO_ONLY" : (
-      var.num_of_static_nat_ips > 0 ? "MANUAL_ONLY" : (
-        "'MANUAL_ONLY' mode requires 'var.num_of_static_nat_ips' to be greater than 0"
+    var.num_of_static_nat_ips == 0 ? "AUTO_ONLY" : (
+      var.nat_attach_manual_ips == "NONE" ? "AUTO_ONLY" : (
+        "MANUAL_ONLY"
   )))
   all_nat_ips = google_compute_address.static_nat_ips.*.self_link
   selected_nat_ips = (

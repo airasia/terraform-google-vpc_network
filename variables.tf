@@ -128,7 +128,7 @@ variable "num_of_static_nat_ips" {
 }
 
 variable "nat_attach_manual_ips" {
-  description = "This value decides whether (or not) (or how many of) the manual IPs created via \"var.num_of_static_nat_ips\" should be attached to the Cloud NAT. Acceptable values are \"ALL\" or \"NONE\" or a string decimal number (eg: \"1\", \"2\", \"3\" etc). Setting a string decimal number will attach only the first 'n' number of IP addresses created via \"var.num_of_static_nat_ips\" allowing you to pre-provision manual NAT IPs (eg: for allowlisting them to upstream services) before actually attaching them to the Cloud NAT."
+  description = "This value decides whether (or not) (or how many of) the manual IPs created via \"var.num_of_static_nat_ips\" should be attached to the Cloud NAT. Acceptable values are \"ALL\" or \"NONE\" or a string decimal number (eg: \"1\", \"2\", \"3\" etc). Setting a string decimal number will attach only the first 'n' number of IP addresses created via \"var.num_of_static_nat_ips\" allowing you to pre-provision new manual NAT IPs before actually attaching them to the Cloud NAT (eg: for allowlisting them with upstream services before starting to use them). This field is ignored if \"var.num_of_static_nat_ips\" is set to '0' (zero)."
   type        = string
   default     = "ALL"
 }

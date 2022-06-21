@@ -30,7 +30,7 @@ output "cloud_nat_id" {
 
 output "cloud_nat_ips" {
   description = "External IP addresses created for (but not necessarily attached to) the VPC's Cloud NAT. This will return an empty list if \"var.num_of_static_nat_ips\" is set to \"0\"."
-  value       = google_compute_address.static_nat_ips.*.address
+  value       = local.created_nat_ips.*.address
 }
 
 output "ip_range_names_private_k8s_pods" {

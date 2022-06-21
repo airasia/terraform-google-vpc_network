@@ -34,17 +34,18 @@ locals {
   # Cloud NAT --------------------------------------------------------------------------------------
   cloud_router_name      = format("%s-%s", var.name_cloud_router, var.name_suffix)
   cloud_nat_name         = format("%s-%s", var.name_cloud_nat, var.name_suffix)
+  all_nat_ips            = google_compute_address.static_nat_ips.*.self_link
   nat_ip_allocate_option = (
     var.num_of_static_nat_ips == 0 ? "AUTO_ONLY" : (
       var.nat_attach_manual_ips == "NONE" ? "AUTO_ONLY" : (
         "MANUAL_ONLY"
   )))
-  all_nat_ips = google_compute_address.static_nat_ips.*.self_link
   selected_nat_ips = (
-    var.nat_attach_manual_ips == "ALL" ? local.all_nat_ips : (
-      var.nat_attach_manual_ips == "NONE" ? [] : (
-        slice(local.all_nat_ips, 0, tonumber(var.nat_attach_manual_ips))
-  )))
+    local.nat_ip_allocate_option == "AUTO_ONLY" ? [] : (
+      var.nat_attach_manual_ips == "ALL" ? local.all_nat_ips : (
+        var.nat_attach_manual_ips == "NONE" ? [] : (
+          slice(local.all_nat_ips, 0, tonumber(var.nat_attach_manual_ips))
+  ))))
   # Google Services Peering ------------------------------------------------------------------------
   g_services_address_name          = format("%s-%s", var.name_g_services_address, var.name_suffix)
   g_services_address_ip            = split("/", local.ip_ranges.private.g_services)[0]

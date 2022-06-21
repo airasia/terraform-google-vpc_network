@@ -29,7 +29,7 @@ output "cloud_nat_id" {
 }
 
 output "cloud_nat_ips" {
-  description = "External IP addresses created (and assigned to private subnet resources) by Cloud NAT if value of \"var.num_of_static_nat_ips\" is greater than \"0\".."
+  description = "External IP addresses created for (but not necessarily attached to) the VPC's Cloud NAT. This will return an empty list if \"var.num_of_static_nat_ips\" is set to \"0\"."
   value       = google_compute_address.static_nat_ips.*.address
 }
 

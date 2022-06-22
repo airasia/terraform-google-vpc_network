@@ -28,9 +28,14 @@ output "cloud_nat_id" {
   value       = google_compute_router_nat.cloud_nat.id
 }
 
-output "cloud_nat_ips" {
-  description = "External IP addresses created (and assigned to private subnet resources) by Cloud NAT if value of \"var.num_of_static_nat_ips\" is greater than \"0\".."
-  value       = google_compute_address.static_nat_ips.*.address
+output "cloud_nat_ips_created" {
+  description = "External IP addresses created for (but not necessarily attached to) the VPC's Cloud NAT. This will return an empty list if \"var.num_of_static_nat_ips\" is set to \"0\"."
+  value       = local.created_nat_ips.*.address
+}
+
+output "cloud_nat_ips_attached" {
+  description = "External IP addresses created & attached to the VPC's Cloud NAT. This will return an empty list if \"var.num_of_static_nat_ips\" is set to \"0\"."
+  value       = local.selected_nat_ips.*.address
 }
 
 output "ip_range_names_private_k8s_pods" {

@@ -32,9 +32,9 @@ locals {
   # Proxy-Only Subnet ------------------------------------------------------------------------------
   create_proxy_only_subnet = local.ip_ranges.proxy_only == "" ? false : true
   # Cloud NAT --------------------------------------------------------------------------------------
-  cloud_router_name      = format("%s-%s", var.name_cloud_router, var.name_suffix)
-  cloud_nat_name         = format("%s-%s", var.name_cloud_nat, var.name_suffix)
-  created_nat_ips        = google_compute_address.static_nat_ips
+  cloud_router_name = format("%s-%s", var.name_cloud_router, var.name_suffix)
+  cloud_nat_name    = format("%s-%s", var.name_cloud_nat, var.name_suffix)
+  created_nat_ips   = google_compute_address.static_nat_ips
   nat_ip_allocate_option = (
     var.num_of_static_nat_ips == 0 ? "AUTO_ONLY" : (
       var.nat_attach_manual_ips == "NONE" ? "AUTO_ONLY" : (

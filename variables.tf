@@ -31,7 +31,7 @@ variable "ip_ranges" {
   EOT
   type = object({
     private_primary    = string
-    private_k8s        = list(object({ name = string, pods = string, svcs = string }))
+    private_k8s        = list(object({ pods_name = string, svcs_name = string, pods = string, svcs = string }))
     private_redis      = list(string)
     private_g_services = string
     proxy_only         = string

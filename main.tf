@@ -14,12 +14,12 @@ locals {
       k8s = flatten([
         for k8s_ip_ranges in var.ip_ranges.private_k8s : [
           {
-            cidr = k8s_ip_ranges.pods,
-            name = format("%s-k8spods-%s", coalesce(k8s_ip_ranges.name, "private"), var.name_suffix)
+            cidr = k8s_ip_ranges.pods_cidr,
+            name = format("%s-%s", coalesce(k8s_ip_ranges.pods_rname, "private-k8spods"), var.name_suffix)
           },
           {
-            cidr = k8s_ip_ranges.svcs,
-            name = format("%s-k8ssvcs-%s", coalesce(k8s_ip_ranges.name, "private"), var.name_suffix)
+            cidr = k8s_ip_ranges.svcs_cidr,
+            name = format("%s-%s", coalesce(k8s_ip_ranges.svcs_rname, "private-k8ssvcs"), var.name_suffix)
           }
         ]
       ])
@@ -32,9 +32,9 @@ locals {
   # Proxy-Only Subnet ------------------------------------------------------------------------------
   create_proxy_only_subnet = local.ip_ranges.proxy_only == "" ? false : true
   # Cloud NAT --------------------------------------------------------------------------------------
-  cloud_router_name      = format("%s-%s", var.name_cloud_router, var.name_suffix)
-  cloud_nat_name         = format("%s-%s", var.name_cloud_nat, var.name_suffix)
-  created_nat_ips        = google_compute_address.static_nat_ips
+  cloud_router_name = format("%s-%s", var.name_cloud_router, var.name_suffix)
+  cloud_nat_name    = format("%s-%s", var.name_cloud_nat, var.name_suffix)
+  created_nat_ips   = google_compute_address.static_nat_ips
   nat_ip_allocate_option = (
     var.num_of_static_nat_ips == 0 ? "AUTO_ONLY" : (
       var.nat_attach_manual_ips == "NONE" ? "AUTO_ONLY" : (

@@ -35,17 +35,16 @@ locals {
   cloud_router_name = format("%s-%s", var.name_cloud_router, var.name_suffix)
   cloud_nat_name    = format("%s-%s", var.name_cloud_nat, var.name_suffix)
   generated_nat_ips = google_compute_address.static_nat_ips
+  selected_generated_ips = (
+    var.nat_select_generated_ips == "ALL" ? local.generated_nat_ips : (
+      var.nat_select_generated_ips == "NONE" ? [] : (
+        slice(local.generated_nat_ips, 0, tonumber(var.nat_select_generated_ips))
+  )))
   nat_ip_allocate_option = (
     var.nat_generate_ips == 0 ? "AUTO_ONLY" : (
       var.nat_select_generated_ips == "NONE" ? "AUTO_ONLY" : (
         "MANUAL_ONLY"
   )))
-  selected_nat_ips = (
-    local.nat_ip_allocate_option == "AUTO_ONLY" ? [] : (
-      var.nat_select_generated_ips == "ALL" ? local.generated_nat_ips : (
-        var.nat_select_generated_ips == "NONE" ? [] : (
-          slice(local.generated_nat_ips, 0, tonumber(var.nat_select_generated_ips))
-  ))))
   # Google Services Peering ------------------------------------------------------------------------
   g_services_address_name          = format("%s-%s", var.name_g_services_address, var.name_suffix)
   g_services_address_ip            = split("/", local.ip_ranges.private.g_services)[0]
@@ -139,7 +138,7 @@ resource "google_compute_router_nat" "cloud_nat" {
   region                              = google_compute_subnetwork.private_subnet.region
   source_subnetwork_ip_ranges_to_nat  = "ALL_SUBNETWORKS_ALL_IP_RANGES"
   nat_ip_allocate_option              = local.nat_ip_allocate_option
-  nat_ips                             = local.selected_nat_ips.*.self_link
+  nat_ips                             = local.selected_generated_ips.*.self_link
   min_ports_per_vm                    = var.nat_min_ports_per_vm
   enable_endpoint_independent_mapping = var.nat_enable_endpoint_independent_mapping
   log_config {

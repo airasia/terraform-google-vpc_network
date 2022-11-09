@@ -104,12 +104,12 @@ variable "vpc_routing_mode" {
 }
 
 variable "nat_generate_ips" {
-  description = "The number of static/manual IPs that should be created for the Cloud NAT. Useful when private instances need to communicate with the internet using specific external IPs that must be allowlisted by 3rd party services. The number of IPs created here will be attached (or detached) to the Cloud NAT based on the value of \"var.nat_attach_manual_ips\"."
+  description = "The number of static/manual IPs that should be created for the Cloud NAT. Useful when private instances need to communicate with the internet using specific external IPs that must be allowlisted by 3rd party services. The number of IPs created here will be attached (or detached) to the Cloud NAT based on the value of \"var.nat_select_generated_ips\"."
   type        = number
   default     = 1
 }
 
-variable "nat_attach_manual_ips" {
+variable "nat_select_generated_ips" {
   description = "This value decides whether (or not) (or how many of) the manual IPs created via \"var.nat_generate_ips\" should be attached to the Cloud NAT. Acceptable values are \"ALL\" or \"NONE\" or a string decimal number (eg: \"1\", \"2\", \"3\" etc). Setting a string decimal number will attach only the first 'n' number of IP addresses created via \"var.nat_generate_ips\" allowing you to pre-provision new manual NAT IPs before actually attaching them to the Cloud NAT (eg: for allowlisting them with upstream services before starting to use them). This field is ignored if \"var.nat_generate_ips\" is set to '0' (zero)."
   type        = string
   default     = "ALL"

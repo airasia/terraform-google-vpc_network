@@ -36,7 +36,7 @@ locals {
   cloud_nat_name    = format("%s-%s", var.name_cloud_nat, var.name_suffix)
   created_nat_ips   = google_compute_address.static_nat_ips
   nat_ip_allocate_option = (
-    var.num_of_static_nat_ips == 0 ? "AUTO_ONLY" : (
+    var.nat_generate_ips == 0 ? "AUTO_ONLY" : (
       var.nat_attach_manual_ips == "NONE" ? "AUTO_ONLY" : (
         "MANUAL_ONLY"
   )))
@@ -128,7 +128,7 @@ resource "google_compute_router" "cloud_router" {
 }
 
 resource "google_compute_address" "static_nat_ips" {
-  count  = var.num_of_static_nat_ips
+  count  = var.nat_generate_ips
   name   = "${var.name_static_nat_ips}-${count.index + 1}-${var.name_suffix}"
   region = google_compute_subnetwork.private_subnet.region
 }

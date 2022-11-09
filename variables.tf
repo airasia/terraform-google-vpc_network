@@ -115,6 +115,12 @@ variable "nat_select_generated_ips" {
   default     = "ALL"
 }
 
+variable "nat_attach_pre_existing_ips" {
+  description = "List of external IP names (that are already pre-existing inside the GCP project) that you would like to attach to the Cloud NAT in this module. The external IPs referred here will be attached to the CloudNAT *IN ADDITION TO* the IPs generated (and selected) inside this module via \"var.nat_generate_ips\" (and \"var.nat_select_generated_ips\")."
+  type        = list(string)
+  default     = ["NONE"]
+}
+
 variable "name_static_nat_ips" {
   description = "Portion of name to be generated for the static/manual NAT IP addresses if value of \"var.nat_generate_ips\" is greater than \"0\"."
   type        = string

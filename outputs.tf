@@ -34,8 +34,8 @@ output "cloud_nat_ips_created" {
 }
 
 output "cloud_nat_ips_attached" {
-  description = "External IP addresses created & attached to the VPC's Cloud NAT. This will return an empty list if \"var.nat_generate_ips\" is set to \"0\"."
-  value       = local.selected_generated_ips.*.address
+  description = "IP addresses attached to the VPC's Cloud NAT."
+  value       = local.selected_ips_for_nat.*.address
 }
 
 output "ip_range_names_private_k8s_pods" {

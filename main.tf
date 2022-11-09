@@ -40,11 +40,7 @@ locals {
       var.nat_select_generated_ips == "NONE" ? [] : (
         slice(local.generated_nat_ips, 0, tonumber(var.nat_select_generated_ips))
   )))
-  nat_ip_allocate_option = (
-    var.nat_generate_ips == 0 ? "AUTO_ONLY" : (
-      var.nat_select_generated_ips == "NONE" ? "AUTO_ONLY" : (
-        "MANUAL_ONLY"
-  )))
+  nat_ip_allocate_option = length(local.selected_generated_ips) == 0 ? "AUTO_ONLY" : "MANUAL_ONLY"
   # Google Services Peering ------------------------------------------------------------------------
   g_services_address_name          = format("%s-%s", var.name_g_services_address, var.name_suffix)
   g_services_address_ip            = split("/", local.ip_ranges.private.g_services)[0]

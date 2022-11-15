@@ -121,7 +121,7 @@ variable "nat_attach_pre_existing_ips" {
   default     = ["NONE"]
 }
 
-variable "name_static_nat_ips" {
+variable "nat_generate_ips_name" {
   description = "Portion of name to be generated for the static/manual NAT IP addresses if value of \"var.nat_generate_ips\" is greater than \"0\"."
   type        = string
   default     = "nat-manual-ip"

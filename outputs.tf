@@ -28,7 +28,7 @@ output "cloud_nat_id" {
   value       = google_compute_router_nat.cloud_nat.id
 }
 
-output "cloud_nat_ips_created" {
+output "cloud_nat_ips_generated" {
   description = "External IP addresses created for (but not necessarily attached to) the VPC's Cloud NAT. This will return an empty list if \"var.nat_generate_ips_count\" is set to \"0\"."
   value       = local.generated_nat_ips.*.address
 }

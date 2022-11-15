@@ -133,9 +133,9 @@ variable "nat_min_ports_per_vm" {
   default     = 64
 }
 
-variable "nat_enable_endpoint_independent_mapping" {
+variable "nat_enable_eim" {
   type        = bool
-  description = "Specifies if endpoint independent mapping is enabled. See https://cloud.google.com/nat/docs/overview#specs-rfcs"
+  description = "Specifies if Endpoint-Independent-Mapping is enabled. See https://cloud.google.com/nat/docs/overview#specs-rfcs"
   default     = false
 }
 

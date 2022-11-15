@@ -29,7 +29,7 @@ output "cloud_nat_id" {
 }
 
 output "cloud_nat_ips_created" {
-  description = "External IP addresses created for (but not necessarily attached to) the VPC's Cloud NAT. This will return an empty list if \"var.nat_generate_ips\" is set to \"0\"."
+  description = "External IP addresses created for (but not necessarily attached to) the VPC's Cloud NAT. This will return an empty list if \"var.nat_generate_ips_count\" is set to \"0\"."
   value       = local.generated_nat_ips.*.address
 }
 

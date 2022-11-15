@@ -103,32 +103,32 @@ variable "vpc_routing_mode" {
   default     = "REGIONAL"
 }
 
-variable "nat_generate_ips" {
+variable "nat_generate_ips_count" {
   description = "The number of static/manual IPs that should be created for the Cloud NAT. Useful when private instances need to communicate with the internet using specific external IPs that must be allowlisted by 3rd party services. The number of IPs created here will be attached (or detached) to the Cloud NAT based on the value of \"var.nat_select_generated_ips\"."
   type        = number
   default     = 1
 }
 
 variable "nat_select_generated_ips" {
-  description = "This value decides whether (or not) (or how many of) the manual IPs created via \"var.nat_generate_ips\" should be attached to the Cloud NAT. Acceptable values are \"ALL\" or \"NONE\" or a string decimal number (eg: \"1\", \"2\", \"3\" etc). Setting a string decimal number will attach only the first 'n' number of IP addresses created via \"var.nat_generate_ips\" allowing you to pre-provision new manual NAT IPs before actually attaching them to the Cloud NAT (eg: for allowlisting them with upstream services before starting to use them). This field is ignored if \"var.nat_generate_ips\" is set to '0' (zero)."
+  description = "This value decides whether (or not) (or how many of) the manual IPs created via \"var.nat_generate_ips_count\" should be attached to the Cloud NAT. Acceptable values are \"ALL\" or \"NONE\" or a string decimal number (eg: \"1\", \"2\", \"3\" etc). Setting a string decimal number will attach only the first 'n' number of IP addresses created via \"var.nat_generate_ips_count\" allowing you to pre-provision new manual NAT IPs before actually attaching them to the Cloud NAT (eg: for allowlisting them with upstream services before starting to use them). This field is ignored if \"var.nat_generate_ips_count\" is set to '0' (zero)."
   type        = string
   default     = "ALL"
 }
 
 variable "nat_attach_pre_existing_ips" {
-  description = "List of external IP names (that are already pre-existing inside the GCP project) that you would like to attach to the Cloud NAT in this module. The external IPs referred here will be attached to the CloudNAT *IN ADDITION TO* the IPs generated (and selected) inside this module via \"var.nat_generate_ips\" (and \"var.nat_select_generated_ips\")."
+  description = "List of external IP names (that are already pre-existing inside the GCP project) that you would like to attach to the Cloud NAT in this module. The external IPs referred here will be attached to the CloudNAT *IN ADDITION TO* the IPs generated (and selected) inside this module via \"var.nat_generate_ips_count\" (and \"var.nat_select_generated_ips\")."
   type        = list(string)
   default     = ["NONE"]
 }
 
 variable "nat_generate_ips_name" {
-  description = "Portion of name to be generated for the static/manual NAT IP addresses if value of \"var.nat_generate_ips\" is greater than \"0\"."
+  description = "Portion of name to be generated for the static/manual NAT IP addresses if value of \"var.nat_generate_ips_count\" is greater than \"0\"."
   type        = string
   default     = "nat-manual-ip"
 }
 
 variable "nat_min_ports_per_vm" {
-  description = "Minimum number of ports reserved by the Cloud NAT for each VM. The number of ports that a Cloud NAT reserves for each VM limits the number of concurrent connections that the VM can make to a specific destination (https://cloud.google.com/nat/docs/ports-and-addresses#ports-and-connections). Each NAT IP supports upto 64,512 ports (65,536 minus 1,024 - https://cloud.google.com/nat/docs/ports-and-addresses#ports). If var.nat_generate_ips is 1 and var.nat_min_ports_per_vm is 64, then the total number of VMs that can be serviced by that Cloud NAT is (1 * 64512 / 64) = 1008 VMs. https://cloud.google.com/nat/docs/ports-and-addresses#port-reservation-examples. As the total number of serviceable VMs increases, the total number of concurrent connections spawnable by a VM decreases. 64 is the default value provided by Google."
+  description = "Minimum number of ports reserved by the Cloud NAT for each VM. The number of ports that a Cloud NAT reserves for each VM limits the number of concurrent connections that the VM can make to a specific destination (https://cloud.google.com/nat/docs/ports-and-addresses#ports-and-connections). Each NAT IP supports upto 64,512 ports (65,536 minus 1,024 - https://cloud.google.com/nat/docs/ports-and-addresses#ports). If var.nat_generate_ips_count is 1 and var.nat_min_ports_per_vm is 64, then the total number of VMs that can be serviced by that Cloud NAT is (1 * 64512 / 64) = 1008 VMs. https://cloud.google.com/nat/docs/ports-and-addresses#port-reservation-examples. As the total number of serviceable VMs increases, the total number of concurrent connections spawnable by a VM decreases. 64 is the default value provided by Google."
   type        = number
   default     = 64
 }

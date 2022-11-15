@@ -135,7 +135,7 @@ resource "google_compute_router" "cloud_router" {
 }
 
 resource "google_compute_address" "static_nat_ips" {
-  count  = var.nat_generate_ips
+  count  = var.nat_generate_ips_count
   name   = "${var.nat_generate_ips_name}-${count.index + 1}-${var.name_suffix}"
   region = google_compute_subnetwork.private_subnet.region
 }

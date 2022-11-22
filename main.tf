@@ -1,5 +1,15 @@
 terraform {
   required_version = ">= 0.13.1" # see https://releases.hashicorp.com/terraform/
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 4.42.0" # see https://github.com/terraform-providers/terraform-provider-google/releases
+    }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = ">= 4.42.0" # see https://github.com/terraform-providers/terraform-provider-google-beta/releases
+    }
+  }
 }
 
 locals {
@@ -34,18 +44,15 @@ locals {
   # Cloud NAT --------------------------------------------------------------------------------------
   cloud_router_name = format("%s-%s", var.name_cloud_router, var.name_suffix)
   cloud_nat_name    = format("%s-%s", var.name_cloud_nat, var.name_suffix)
-  created_nat_ips   = google_compute_address.static_nat_ips
-  nat_ip_allocate_option = (
-    var.num_of_static_nat_ips == 0 ? "AUTO_ONLY" : (
-      var.nat_attach_manual_ips == "NONE" ? "AUTO_ONLY" : (
-        "MANUAL_ONLY"
+  generated_nat_ips = google_compute_address.static_nat_ips
+  selected_generated_ips = (
+    var.nat_select_generated_ips == "ALL" ? local.generated_nat_ips : (
+      var.nat_select_generated_ips == "NONE" ? [] : (
+        slice(local.generated_nat_ips, 0, tonumber(var.nat_select_generated_ips))
   )))
-  selected_nat_ips = (
-    local.nat_ip_allocate_option == "AUTO_ONLY" ? [] : (
-      var.nat_attach_manual_ips == "ALL" ? local.created_nat_ips : (
-        var.nat_attach_manual_ips == "NONE" ? [] : (
-          slice(local.created_nat_ips, 0, tonumber(var.nat_attach_manual_ips))
-  ))))
+  selected_existing_ips  = data.google_compute_addresses.existing_ips.addresses
+  selected_ips_for_nat   = concat(local.selected_generated_ips, local.selected_existing_ips)
+  nat_ip_allocate_option = length(local.selected_ips_for_nat) == 0 ? "AUTO_ONLY" : "MANUAL_ONLY"
   # Google Services Peering ------------------------------------------------------------------------
   g_services_address_name          = format("%s-%s", var.name_g_services_address, var.name_suffix)
   g_services_address_ip            = split("/", local.ip_ranges.private.g_services)[0]
@@ -128,9 +135,13 @@ resource "google_compute_router" "cloud_router" {
 }
 
 resource "google_compute_address" "static_nat_ips" {
-  count  = var.num_of_static_nat_ips
-  name   = "${var.name_static_nat_ips}-${count.index + 1}-${var.name_suffix}"
+  count  = var.nat_generate_ips_count
+  name   = "${var.nat_generate_ips_name}-${count.index + 1}-${var.name_suffix}"
   region = google_compute_subnetwork.private_subnet.region
+}
+
+data "google_compute_addresses" "existing_ips" {
+  filter = join(" OR ", formatlist("(name:%s)", toset(var.nat_attach_pre_existing_ips)))
 }
 
 resource "google_compute_router_nat" "cloud_nat" {
@@ -139,9 +150,9 @@ resource "google_compute_router_nat" "cloud_nat" {
   region                              = google_compute_subnetwork.private_subnet.region
   source_subnetwork_ip_ranges_to_nat  = "ALL_SUBNETWORKS_ALL_IP_RANGES"
   nat_ip_allocate_option              = local.nat_ip_allocate_option
-  nat_ips                             = local.selected_nat_ips.*.self_link
+  nat_ips                             = toset(local.selected_ips_for_nat.*.self_link)
   min_ports_per_vm                    = var.nat_min_ports_per_vm
-  enable_endpoint_independent_mapping = var.nat_enable_endpoint_independent_mapping
+  enable_endpoint_independent_mapping = var.nat_enable_eim
   log_config {
     # If the NAT gateway runs out of NAT IP addresses, Cloud NAT drops packets.
     # Dropped packets are logged when error logging is turned on for Cloud NAT logging.

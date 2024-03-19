@@ -73,6 +73,18 @@ variable "name_cloud_nat" {
   default     = "cloud-nat"
 }
 
+variable "enable_dynamic_port_allocation" {
+  description = <<-EOT
+  (Optional) Enable Dynamic Port Allocation. If minPortsPerVm is set, minPortsPerVm must be set to a power of two 
+  greater than or equal to 32. If minPortsPerVm is not set, a minimum of 32 ports will be allocated to a VM from this 
+  NAT config. If maxPortsPerVm is set, maxPortsPerVm must be set to a power of two greater than minPortsPerVm. If 
+  maxPortsPerVm is not set, a maximum of 65536 ports will be allocated to a VM from this NAT config. Mutually exclusive 
+  with enableEndpointIndependentMapping.
+  EOT
+  type        = bool
+  default     = "false"
+}
+
 variable "name_g_services_address" {
   description = "Portion of name to be generated for the internal IP address that will be created to expose Google services producers (like CloudSQL, Firebase, etc)."
   type        = string

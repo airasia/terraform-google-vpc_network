@@ -176,10 +176,37 @@ resource "google_compute_global_address" "g_services_address" {
   network       = google_compute_network.vpc.self_link
 }
 
+locals {
+   additional_g_service_addresses = [
+    for idx, ip_cidr in var.additional_g_service_ranges : {
+      ip   = split("/", ip_cidr)[0]
+      prefix = split("/", ip_cidr)[1]
+      name = "${local.g_services_address_name }-${idx}"
+    }
+  ]
+}
+
+resource "google_compute_global_address" "additional_g_services_address" {
+  for_each = { for gservice in local.additional_g_service_addresses  : gservice.name => gservice }
+  name          = each.value.name
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  address       = each.value.ip
+  prefix_length = each.value.prefix
+  network       = google_compute_network.vpc.self_link
+}
+
+locals {
+  additional_gservice_adress_names = [for gservice in local.additional_g_service_addresses  : 
+                     google_compute_global_address.additional_g_services_address[gservice.name].name
+                   ]
+  all_gservice_adress_names = concat(local.additional_g_service_addresses, [google_compute_global_address.g_services_address.name] )
+}
+
 resource "google_service_networking_connection" "g_services_connection" {
   network                 = google_compute_network.vpc.self_link
   service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.g_services_address.name]
+  reserved_peering_ranges = local.all_gservice_adress_names
 }
 
 resource "google_compute_global_address" "global_external_ip" {

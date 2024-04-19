@@ -200,7 +200,7 @@ locals {
   additional_gservice_adress_names = [for gservice in local.additional_g_service_addresses  : 
                      google_compute_global_address.additional_g_services_address[gservice.name].name
                    ]
-  all_gservice_adress_names = concat(local.additional_g_service_addresses, [google_compute_global_address.g_services_address.name] )
+  all_gservice_adress_names = concat(local.additional_gservice_adress_names , [google_compute_global_address.g_services_address.name] )
 }
 
 resource "google_service_networking_connection" "g_services_connection" {

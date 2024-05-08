@@ -55,6 +55,7 @@ To overcome this you have to do the following ,
 
 1) Create a "temp" reserved range and attach only this to the connection, so all the other reserved ranges are detached from the connection :
 
+```
 export PROJECT_ID=YOUR_PROJECT_ID
 export VPC_NETWORK=NAME_OF_THE_VPC 
 
@@ -72,6 +73,7 @@ gcloud services vpc-peerings update \
     --ranges=temp \
     --network=$VPC_NETWORK  \
     --project=$PROJECT_ID
+```
 
 2) Terraform plan and apply. 
 3) Delete the "temp" reserved range:

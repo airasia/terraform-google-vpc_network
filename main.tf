@@ -193,7 +193,7 @@ locals {
 resource "google_service_networking_connection" "g_services_connection" {
   network                 = google_compute_network.vpc.self_link
   service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [local.gservice_adress_names]
+  reserved_peering_ranges = local.gservice_adress_names
 }
 
 resource "google_compute_global_address" "global_external_ip" {

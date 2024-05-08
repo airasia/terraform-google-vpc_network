@@ -1,7 +1,8 @@
 Terraform module for a VPC Network in GCP
 
-# Upgrade guide from v2.15.0 to v3.0
+# Upgrade guide from v2.15.0 to v3.0.0
 var.ip_ranges.private_g_services now expects list of CIDR strings instead of just 1 CIDR string so we can have additional CIDR ranges for private service access. 
+
 For example, 
 
 ```
@@ -38,21 +39,21 @@ module "vpc" {
 }
 ```
 
-If you face errors like the following 
+If you face errors like the following :
 
 ```
 Error: Error waiting to create GlobalAddress: Error waiting for Creating GlobalAddress: Invalid IP CIDR range: 10.24.0.0/16 conflicts with IP range 10.24.0.0/16 that was allocated by resource projects/PROJECT_ID/global/addresses/gservices-address-tfstg-edsh.
 ```
 
-This is because of a bug in GCP side where deleting a range before detaching it from the connection will not allow you to recreate the range : 
+This is because of a bug in GCP side where deleting a reserved range before detaching it from the connection will not allow you to recreate the range : 
 https://cloud.google.com/vpc/docs/configure-private-services-access#deleting-allocation 
 
 
-In terraform, the range gets deleted first and then gets detached from the connection because of resource dependencies are like that. So whenever we want to destroy and recreate a range, we will run into this issue. 
+In terraform, the reserved range gets deleted first and then gets detached from the connection because of resource dependencies. So whenever we want to destroy and recreate a reserved range, we will run into this issue. 
 
-So, to overcome this you have to do the following ,
+To overcome this you have to do the following ,
 
-1) Create a "temp" raserved range and attach only this to the connection, so all the other ranges are detached from the connection :
+1) Create a "temp" reserved range and attach only this to the connection, so all the other reserved ranges are detached from the connection :
 
 export PROJECT_ID=YOUR_PROJECT_ID
 export VPC_NETWORK=NAME_OF_THE_VPC 
@@ -61,7 +62,7 @@ gcloud compute addresses create temp \
     --global \
     --purpose=VPC_PEERING \
     --prefix-length=16 \
-    --description="DESCRIPTION" \
+    --description="temporary range" \
     --network=$VPC_NETWORK \
     --project=$PROJECT_ID
 

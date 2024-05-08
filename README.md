@@ -78,12 +78,14 @@ gcloud services vpc-peerings update \
 2) Terraform plan and apply. 
 3) Delete the "temp" reserved range:
 
+```
 gcloud services vpc-peerings update \
    --force \
     --service=servicenetworking.googleapis.com \
     --ranges=temp \
     --network=$VPC_NETWORK  \
     --project=$PROJECT_ID
+```
 
 # Upgrade guide from v2.14.0 to v2.15.0
 

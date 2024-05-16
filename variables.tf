@@ -33,7 +33,7 @@ variable "ip_ranges" {
     private_primary    = string
     private_k8s        = list(object({ pods_cidr = string, svcs_cidr = string, pods_rname = string, svcs_rname = string }))
     private_redis      = list(string)
-    private_g_services = string
+    private_g_services = list(string)
     proxy_only         = string
     serverless_access  = list(string)
   })

@@ -61,11 +61,7 @@ output "ip_ranges_private_redis_store" {
 
 output "ip_range_private_g_services" {
   description = "Private subnet IP range for Google service producers. Eg: CloudSQL, Firebase, Redis, Memcache Etc."
-  value = format(
-    "%s/%s",
-    google_compute_global_address.g_services_address.address,
-    google_compute_global_address.g_services_address.prefix_length
-  )
+  value       = var.ip_ranges.private_g_services
 }
 
 output "ip_range_proxy_only" {

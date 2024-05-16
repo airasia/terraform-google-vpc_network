@@ -42,50 +42,10 @@ module "vpc" {
 If you face errors like the following :
 
 ```
-Error: Error waiting to create GlobalAddress: Error waiting for Creating GlobalAddress: Invalid IP CIDR range: 10.24.0.0/16 conflicts with IP range 10.24.0.0/16 that was allocated by resource projects/PROJECT_ID/global/addresses/gservices-address-tfstg-edsh.
+Error: Error waiting to create GlobalAddress: Error waiting for Creating GlobalAddress: Invalid IP CIDR range: 10.24.0.0/16 conflicts with IP range 10.150.0.0/16 that was allocated by resource projects/PROJECT_ID/global/addresses/gservice-adress
 ```
 
-This is because of a bug in GCP side where deleting a reserved range before detaching it from the connection will not allow you to recreate the range : 
-https://cloud.google.com/vpc/docs/configure-private-services-access#deleting-allocation 
-
-
-In terraform, the reserved range gets deleted first and then gets detached from the connection because of resource dependencies. So whenever we want to destroy and recreate a reserved range, we will run into this issue. 
-
-To overcome this you have to do the following ,
-
-1) Create a "temp" reserved range and attach only this to the connection, so all the other reserved ranges are detached from the connection :
-
-```
-export PROJECT_ID=YOUR_PROJECT_ID
-export VPC_NETWORK=NAME_OF_THE_VPC 
-
-gcloud compute addresses create temp \
-    --global \
-    --purpose=VPC_PEERING \
-    --prefix-length=16 \
-    --description="temporary range" \
-    --network=$VPC_NETWORK \
-    --project=$PROJECT_ID
-
-gcloud services vpc-peerings update \
-   --force \
-    --service=servicenetworking.googleapis.com \
-    --ranges=temp \
-    --network=$VPC_NETWORK  \
-    --project=$PROJECT_ID
-```
-
-2) Terraform plan and apply. 
-3) Delete the "temp" reserved range:
-
-```
-gcloud services vpc-peerings update \
-   --force \
-    --service=servicenetworking.googleapis.com \
-    --ranges=temp \
-    --network=$VPC_NETWORK  \
-    --project=$PROJECT_ID
-```
+This happens because of the concurrency nature of terraform. While terraform is deleting a reserved CIDR range, it's trying to create this same range or a range that overlaps with it at the same time. Re-trying planning and applying steps will solve it.
 
 # Upgrade guide from v2.14.0 to v2.15.0
 

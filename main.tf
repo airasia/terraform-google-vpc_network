@@ -153,6 +153,7 @@ resource "google_compute_router_nat" "cloud_nat" {
   nat_ips                             = toset(local.selected_ips_for_nat.*.self_link)
   min_ports_per_vm                    = var.nat_min_ports_per_vm
   enable_endpoint_independent_mapping = var.nat_enable_eim
+  enable_dynamic_port_allocation      = var.enable_dynamic_port_allocation
   log_config {
     # If the NAT gateway runs out of NAT IP addresses, Cloud NAT drops packets.
     # Dropped packets are logged when error logging is turned on for Cloud NAT logging.

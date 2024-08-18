@@ -47,6 +47,8 @@ Error: Error waiting to create GlobalAddress: Error waiting for Creating GlobalA
 
 This happens because of the concurrency nature of terraform. While terraform is deleting a reserved CIDR range, it's trying to create this same range or a range that overlaps with it at the same time. Re-trying planning and applying steps will solve it.
 
+When changing "private_g_services" values, if plan shows destruction/recreation of resources like redis, cloudsql etc you can plan and apply only the vpc module first to solve this.
+
 # Upgrade guide from v2.14.0 to v2.15.0
 
 Renamed input variables:

@@ -21,7 +21,7 @@ variable "ip_ranges" {
 
   "private_redis": List of CIDR ranges (/29 advised) for Redis instances. Not required for redis instances that use the recommended "PRIVATE_SERVICE_ACCESS" mode. See https://www.terraform.io/docs/providers/google/r/redis_instance.html#reserved_ip_range. See https://cloud.google.com/memorystore/docs/redis/networking#connection_modes.
 
-  "private_g_services": A CIDR range (/20 advised) for Google services producers (like CloudSQL, Firebase, etc) in private subnet of the VPC. See https://cloud.google.com/vpc/docs/configure-private-services-access#allocating-range. See https://cloud.google.com/sql/docs/mysql/configure-private-services-access#configure-access.
+  "private_g_services": A CIDR range (/16 advised) for Google services producers (like CloudSQL, Firebase, etc) in private subnet of the VPC. See https://cloud.google.com/vpc/docs/configure-private-services-access#allocating-range. See https://cloud.google.com/sql/docs/mysql/configure-private-services-access#configure-access.
 
   "proxy_only": An empty string or a CIDR range (/24 advised) for Proxy-Only subnet. Use empty string "" or specify null to avoid creating Proxy-Only subnet. See https://cloud.google.com/load-balancing/docs/l7-internal/proxy-only-subnets#proxy_only_subnet_create
 

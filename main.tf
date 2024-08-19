@@ -33,8 +33,7 @@ locals {
           }
         ]
       ])
-      redis      = var.ip_ranges.private_redis # Only reserved here for visibility. Not used in this module.
-      g_services = var.ip_ranges.private_g_services
+      redis = var.ip_ranges.private_redis # Only reserved here for visibility. Not used in this module.
     }
     proxy_only        = var.ip_ranges.proxy_only == null ? "" : var.ip_ranges.proxy_only
     serverless_access = var.ip_ranges.serverless_access # Only reserved here for visibility. Not used in this module.
@@ -54,9 +53,7 @@ locals {
   selected_ips_for_nat   = concat(local.selected_generated_ips, local.selected_existing_ips)
   nat_ip_allocate_option = length(local.selected_ips_for_nat) == 0 ? "AUTO_ONLY" : "MANUAL_ONLY"
   # Google Services Peering ------------------------------------------------------------------------
-  g_services_address_name          = format("%s-%s", var.name_g_services_address, var.name_suffix)
-  g_services_address_ip            = split("/", local.ip_ranges.private.g_services)[0]
-  g_services_address_prefix_length = split("/", local.ip_ranges.private.g_services)[1]
+  g_services_address_name = format("%s-%s", var.name_g_services_address, var.name_suffix)
   # ------------------------------------------------------------------------------------------------
 }
 
@@ -168,19 +165,36 @@ resource "google_compute_router_nat" "cloud_nat" {
   }
 }
 
-resource "google_compute_global_address" "g_services_address" {
-  name          = local.g_services_address_name
+locals {
+  g_service_addresses = [
+    for idx, ip_cidr in var.ip_ranges.private_g_services : {
+      ip     = split("/", ip_cidr)[0]
+      prefix = split("/", ip_cidr)[1]
+      name   = "${local.g_services_address_name}-${idx}"
+    }
+  ]
+}
+
+resource "google_compute_global_address" "additional_g_services_address" {
+  for_each      = { for gservice in local.g_service_addresses : gservice.name => gservice }
+  name          = each.value.name
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
-  address       = local.g_services_address_ip
-  prefix_length = local.g_services_address_prefix_length
+  address       = each.value.ip
+  prefix_length = each.value.prefix
   network       = google_compute_network.vpc.self_link
+}
+
+locals {
+  gservice_adress_names = [for gservice in local.g_service_addresses :
+    google_compute_global_address.additional_g_services_address[gservice.name].name
+  ]
 }
 
 resource "google_service_networking_connection" "g_services_connection" {
   network                 = google_compute_network.vpc.self_link
   service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.g_services_address.name]
+  reserved_peering_ranges = local.gservice_adress_names
 }
 
 resource "google_compute_global_address" "global_external_ip" {

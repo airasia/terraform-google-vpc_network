@@ -26,7 +26,7 @@ Needs to be updated the following way :
 ```
 module "vpc" {
   source      = "airasia/vpc_network/google"
-  version     = "2.15.0"
+  version     = "3.0.0"
   name_suffix = local.name_suffix
   ip_ranges = {
     private_primary    = "10.20.0.0/16"

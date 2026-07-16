@@ -111,8 +111,8 @@ resource "google_compute_subnetwork" "proxy_only_subnet" {
   network       = google_compute_network.vpc.self_link
   region        = data.google_client_config.google_client.region
   ip_cidr_range = local.ip_ranges.proxy_only
-  purpose       = "INTERNAL_HTTPS_LOAD_BALANCER" # required for proxy-only subnets - see https://www.terraform.io/docs/providers/google/r/compute_subnetwork.html
-  role          = "ACTIVE"                       # used when purpose = INTERNAL_HTTPS_LOAD_BALANCER - see https://www.terraform.io/docs/providers/google/r/compute_subnetwork.html
+  purpose       = "REGIONAL_MANAGED_PROXY" # canonical GCP API value; replaces deprecated INTERNAL_HTTPS_LOAD_BALANCER
+  role          = "ACTIVE"                # used when purpose = REGIONAL_MANAGED_PROXY
   timeouts {
     create = var.subnet_timeout
     update = var.subnet_timeout

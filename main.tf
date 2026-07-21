@@ -112,7 +112,7 @@ resource "google_compute_subnetwork" "proxy_only_subnet" {
   region        = data.google_client_config.google_client.region
   ip_cidr_range = local.ip_ranges.proxy_only
   purpose       = "REGIONAL_MANAGED_PROXY" # canonical GCP API value; replaces deprecated INTERNAL_HTTPS_LOAD_BALANCER
-  role          = "ACTIVE"                # used when purpose = REGIONAL_MANAGED_PROXY
+  role          = "ACTIVE"                 # used when purpose = REGIONAL_MANAGED_PROXY
   timeouts {
     create = var.subnet_timeout
     update = var.subnet_timeout
@@ -166,17 +166,22 @@ resource "google_compute_router_nat" "cloud_nat" {
 }
 
 locals {
-  g_service_addresses = [
-    for idx, ip_cidr in var.ip_ranges.private_g_services : {
+  # Keyed by numeric string index ("0", "1", ...) so the moved block below can use a static literal key.
+  # The first element (index 0) preserves the original singleton name for backward compatibility —
+  # upgrading from v2.x does not rename the GCP resource or force-replace the address.
+  # Additional ranges get a numeric suffix ("-1", "-2", ...).
+  g_service_addresses = {
+    for idx, ip_cidr in var.ip_ranges.private_g_services :
+    tostring(idx) => {
       ip     = split("/", ip_cidr)[0]
       prefix = split("/", ip_cidr)[1]
-      name   = "${local.g_services_address_name}-${idx}"
+      name   = idx == 0 ? local.g_services_address_name : "${local.g_services_address_name}-${idx}"
     }
-  ]
+  }
 }
 
 resource "google_compute_global_address" "additional_g_services_address" {
-  for_each      = { for gservice in local.g_service_addresses : gservice.name => gservice }
+  for_each      = local.g_service_addresses
   name          = each.value.name
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
@@ -186,9 +191,19 @@ resource "google_compute_global_address" "additional_g_services_address" {
 }
 
 locals {
-  gservice_adress_names = [for gservice in local.g_service_addresses :
-    google_compute_global_address.additional_g_services_address[gservice.name].name
+  gservice_adress_names = [for key, gservice in local.g_service_addresses :
+    google_compute_global_address.additional_g_services_address[key].name
   ]
+}
+
+# Migration block: v2.x had a singleton google_compute_global_address.g_services_address.
+# v3.x restructured it to a for_each map. This moved block tells Terraform the singleton
+# is now tracked at key "0" — no GCP resource is destroyed or recreated on upgrade.
+# The literal key "0" is intentional: it matches the tostring(idx) key above and allows
+# this block to ship inside the module (moved blocks require static addresses).
+moved {
+  from = google_compute_global_address.g_services_address
+  to   = google_compute_global_address.additional_g_services_address["0"]
 }
 
 resource "google_service_networking_connection" "g_services_connection" {
